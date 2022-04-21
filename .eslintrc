@@ -1,0 +1,55 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/strongly-recommended"
+  ],
+  "rules": {
+    "no-console": "off",
+    "no-debugger": "off",
+    "no-trailing-spaces": "error",
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "vue/array-bracket-spacing": "error",
+    "vue/arrow-spacing": "error",
+    "vue/block-spacing": "error",
+    "vue/brace-style": "error",
+    "vue/comma-dangle": "error",
+    "vue/key-spacing": "error",
+    "vue/match-component-file-name": "error",
+    "vue/script-indent": "error",
+    "vue/attribute-hyphenation": "off",
+    "vue/prop-name-casing": "off",
+    "vue/multiline-html-element-content-newline": "off",
+    "comma-dangle": ["error", "always-multiline"],
+    "vue/multi-word-component-names": "off"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "extends": [
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "rules": {
+        "@typescript-eslint/member-delimiter-style": ["error", {
+          "multiline": {
+            "delimiter": "none",
+            "requireLast": true
+          },
+          "singleline": {
+            "delimiter": "comma",
+            "requireLast": false
+          }
+        }],
+        "@typescript-eslint/prefer-as-const": "off"
+      }
+    }
+  ]
+}
