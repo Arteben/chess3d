@@ -15,7 +15,7 @@ const babelLoader = {
 }
 
 module.exports = {
-  entry: `${paths.src}/main.ts`,
+  entry: `${paths.src}/main.js`,
   output: {
     path: paths.build,
     filename: 'js/[name].bundle.js',
@@ -88,13 +88,13 @@ module.exports = {
     new VueLoaderPlugin(),
     new webpack.ProgressPlugin(),
 
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: `${paths.public}/`,
-        },
-      ],
-    }),
+    // new CopyWebpackPlugin({
+    //   patterns: [
+    //     {
+    //       from: `${paths.public}/`,
+    //     },
+    //   ],
+    // }),
 
     new HtmlWebpackPlugin({
       template: 'template.html',
