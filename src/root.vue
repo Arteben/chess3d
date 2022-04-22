@@ -5,17 +5,21 @@
       <button @click="show()">show text</button>
     </span>
   </div>
+  <div ref="screen" />
 </template>
 
 <script>
-import { showText } from '@/main.ts'
+import { setThree } from '@/main.ts'
+import { onMounted, ref } from 'vue'
 export default {
   name: 'RootElement',
   setup() {
-    const show = function () {
-      showText('chess 3d')
-    }
-    return { show }
+    const screen = ref(null)
+    onMounted(() => {
+      setThree(screen.value)
+    })
+
+    return { screen }
   },
 }
 </script>
