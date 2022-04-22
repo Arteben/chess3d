@@ -5,8 +5,7 @@
     "@typescript-eslint"
   ],
   "extends": [
-    "eslint:recommended",
-    "plugin:vue/strongly-recommended"
+    "eslint:recommended"
   ],
   "rules": {
     "no-console": "off",
@@ -16,19 +15,8 @@
       "error",
       "single"
     ],
-    "vue/array-bracket-spacing": "error",
-    "vue/arrow-spacing": "error",
-    "vue/block-spacing": "error",
-    "vue/brace-style": "error",
-    "vue/comma-dangle": "error",
-    "vue/key-spacing": "error",
-    "vue/match-component-file-name": "error",
-    "vue/script-indent": "error",
-    "vue/attribute-hyphenation": "off",
-    "vue/prop-name-casing": "off",
-    "vue/multiline-html-element-content-newline": "off",
     "comma-dangle": ["error", "always-multiline"],
-    "vue/multi-word-component-names": "off"
+    "no-undef": "off"
   },
   "overrides": [
     {
@@ -49,6 +37,28 @@
           }
         }],
         "@typescript-eslint/prefer-as-const": "off"
+      }
+    },
+    {
+      "files": ["*.vue"],
+      "parser": "vue-eslint-parser",
+      "extends": [
+        "eslint:recommended",
+        "plugin:vue/vue3-recommended"
+      ],
+      "rules": {
+        "vue/array-bracket-spacing": "error",
+        "vue/arrow-spacing": "error",
+        "vue/block-spacing": "error",
+        "vue/brace-style": "error",
+        "vue/comma-dangle": "error",
+        "vue/key-spacing": "error",
+        "vue/match-component-file-name": "error",
+        "vue/script-indent": "error",
+        "vue/attribute-hyphenation": "off",
+        "vue/prop-name-casing": "off",
+        "vue/multiline-html-element-content-newline": "off",
+        "vue/multi-word-component-names": "off"
       }
     }
   ]

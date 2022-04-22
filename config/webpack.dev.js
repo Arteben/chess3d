@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const paths = require('./paths')
 
 const webpack = require('webpack')

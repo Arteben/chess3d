@@ -1,9 +1,8 @@
-/* eslint-disable no-undef */
 const paths = require('./paths')
 
 const webpack = require('webpack')
 
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+// const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 

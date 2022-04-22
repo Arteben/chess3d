@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "webpack serve -c config/webpack.dev.js",
     "build": "webpack -c config/webpack.prod.js",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint --ext .js,.vue,.ts src"
   },
   "keywords": [],
   "author": "",
