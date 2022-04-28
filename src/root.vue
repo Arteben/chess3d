@@ -1,34 +1,39 @@
 <template>
-  <div class="title">
+  <div id="root">
+    <main-menu />
+  </div>
+  <!-- <div class="title">
     <span>
       CHESS 3d project <br>
       <button @click="show()">show text</button>
     </span>
   </div>
-  <div ref="screen" />
+  <div ref="screen" /> -->
 </template>
 
 <script>
-import { setThree } from '@/main.ts'
-import { onMounted, ref } from 'vue'
+// import { onMounted, ref } from 'vue'
+import MainMenu from '@/components/main-menu.vue'
 export default {
   name: 'RootElement',
+  components: {
+    MainMenu,
+  },
   setup() {
-    const screen = ref(null)
-    onMounted(() => {
-      setThree(screen.value)
-    })
-
-    return { screen }
   },
 }
 </script>
 
-<style scoped lang="sass">
-.title {
-  color: white;
-  span {
-    color: green;
-  }
+<style lang="sass">
+BODY {
+  background: gray;
+}
+</style>
+
+<style lang="sass" scoped>
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
