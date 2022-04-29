@@ -1,25 +1,40 @@
 <template>
   <div id="root">
-    <main-menu />
+    <main-menu
+      @open-menu="onSelectMenu"
+    />
+    <field />
+    <popup-menu
+      v-if="popupMenu"
+      :p_menu="popupMenu"
+      @close-popup="onClosePopup()"
+    />
   </div>
-  <!-- <div class="title">
-    <span>
-      CHESS 3d project <br>
-      <button @click="show()">show text</button>
-    </span>
-  </div>
-  <div ref="screen" /> -->
 </template>
 
 <script>
-// import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import MainMenu from '@/components/main-menu.vue'
+import Field from '@/components/field.vue'
+import PopupMenu from '@/components/popup-menu.vue'
 export default {
   name: 'RootElement',
   components: {
     MainMenu,
+    Field,
+    PopupMenu,
   },
   setup() {
+    let popupMenu = ref('')
+
+    const onSelectMenu = (_title) => {
+      popupMenu.value = _title
+    }
+
+    const onClosePopup = () => {
+      popupMenu.value = ''
+    }
+    return { onSelectMenu, popupMenu, onClosePopup }
   },
 }
 </script>

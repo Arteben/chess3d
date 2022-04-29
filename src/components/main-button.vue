@@ -3,12 +3,11 @@
     class="button"
     type="button"
     :value="p_title"
-    @click="p_onClick"
+    @click="$emit('click-main-btn')"
   >
 </template>
 
 <script>
-// import { onMounted, ref } from 'vue'
 export default {
   name: 'MenuButton',
   props: {
@@ -16,11 +15,8 @@ export default {
       type: String,
       default: '',
     },
-    p_onClick: {
-      type: Function,
-      default: () => {},
-    },
   },
+  emits: ['click-main-btn'],
 }
 </script>
 
