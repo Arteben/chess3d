@@ -4,14 +4,15 @@
       v-for="btn in btns"
       :key="btn"
       :p_title="btn"
-      @click-main-btn="clickBtn(btn)"
+      @click-btn="clickBtn(btn)"
     />
   </div>
 </template>
 
 <script>
 // import { onMounted, ref } from 'vue'
-import MainButton from '@/components/main-button.vue'
+import { getMainMenuBtns } from '@/utils/common'
+import MainButton from '@/components/button.vue'
 export default {
   name: 'MainMenu',
   components: {
@@ -20,7 +21,7 @@ export default {
   emits: ['open-menu'],
   // eslint-disable-next-line no-unused-vars
   setup(props, { emit }) {
-    const btns = [ 'game', 'settings' ]
+    const btns = getMainMenuBtns()
     const clickBtn = (_title) => {
       emit('open-menu', _title)
     }

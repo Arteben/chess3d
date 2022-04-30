@@ -3,11 +3,14 @@
     <main-menu
       @open-menu="onSelectMenu"
     />
-    <field />
+    <field
+      :key="game"
+    />
     <popup-menu
       v-if="popupMenu"
       :p_menu="popupMenu"
       @close-popup="onClosePopup()"
+      @start-game="onStartGame"
     />
   </div>
 </template>
@@ -26,6 +29,7 @@ export default {
   },
   setup() {
     let popupMenu = ref('')
+    let game = ref('')
 
     const onSelectMenu = (_title) => {
       popupMenu.value = _title
@@ -34,7 +38,19 @@ export default {
     const onClosePopup = () => {
       popupMenu.value = ''
     }
-    return { onSelectMenu, popupMenu, onClosePopup }
+
+    const onStartGame = (_type) => {
+      game.value = _type
+      console.log(game.value)
+    }
+
+    return {
+      onSelectMenu,
+      popupMenu,
+      onClosePopup,
+      onStartGame,
+      game,
+    }
   },
 }
 </script>

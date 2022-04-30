@@ -3,20 +3,20 @@
     class="button"
     type="button"
     :value="p_title"
-    @click="$emit('click-main-btn')"
+    @click.stop="$emit('click-btn')"
   >
 </template>
 
 <script>
 export default {
-  name: 'MenuButton',
+  name: 'Button',
   props: {
     p_title: {
       type: String,
       default: '',
     },
   },
-  emits: ['click-main-btn'],
+  emits: ['click-btn'],
 }
 </script>
 
