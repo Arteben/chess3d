@@ -3,9 +3,7 @@
     <main-menu
       @open-menu="onSelectMenu"
     />
-    <field
-      :key="game"
-    />
+    <field :p_game="game" />
     <popup-menu
       v-if="popupMenu"
       :p_menu="popupMenu"
@@ -41,7 +39,6 @@ export default {
 
     const onStartGame = (_type) => {
       game.value = _type
-      console.log(game.value)
     }
 
     return {

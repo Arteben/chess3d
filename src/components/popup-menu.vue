@@ -30,7 +30,7 @@
 
 <script>
 // import { onMounted } from 'vue'
-import { getMainMenuBtns, getGameTypes } from '@/utils/common'
+import { getMainMenuBtns, getGameTypes } from '@/utils/menuPoints'
 import MyButton from '@/components/button.vue'
 export default {
   name: 'PopupMenu',

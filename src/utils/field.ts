@@ -1,31 +1,38 @@
 
 import * as THREE from 'three'
 
-export const getViewport = function (_el: HTMLElement = document.body, innerWidth = 300, innerHeight = 300) {
-  const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.01, 10)
-  camera.position.z = 1
+export class ChessField {
+  camera: THREE.Camera
+  scene: THREE.Scene
+  renderer: THREE.WebGLRenderer
+  box: THREE.Mesh
 
-  const scene = new THREE.Scene()
+  setBackground() {
+    this.scene.background = new THREE.Color(0x112211)
+  }
 
-  const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2)
-  const material = new THREE.MeshNormalMaterial()
+  constructor (_el: HTMLElement = document.body, _innerWidth = 300, _innerHeight = 300) {
+    this.camera = new THREE.PerspectiveCamera(70, _innerWidth / _innerHeight, 0.01, 10)
+    this.camera.position.z = 1
 
-  const mesh = new THREE.Mesh(geometry, material)
-  scene.add(mesh)
+    this.scene = new THREE.Scene()
+    this.scene.background = new THREE.Color(0x222)
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true })
-  renderer.setSize(innerWidth, innerHeight)
-  renderer.setAnimationLoop(animation)
+    this.renderer = new THREE.WebGLRenderer({ antialias: true })
+    this.renderer.setSize(_innerWidth, _innerHeight)
+    _el.appendChild(this.renderer.domElement)
 
-  _el.appendChild(renderer.domElement)
 
-  // animation
 
-  function animation(time: number) {
-
-    mesh.rotation.x = time / 2000
-    mesh.rotation.y = time / 1000
-
-    renderer.render(scene, camera)
+    //simple box for waiting
+    const geometryBox = new THREE.BoxGeometry(0.1, 0.1, 0.1,2)
+    const materialBox = new THREE.MeshNormalMaterial()
+    this.box = new THREE.Mesh(geometryBox, materialBox)
+    this.scene.add(this.box)
+    this.renderer.setAnimationLoop((time) => {
+      this.box.rotation.x = time / 2040
+      this.box.rotation.y = time / 500
+      this.renderer.render(this.scene, this.camera)
+    })
   }
 }
