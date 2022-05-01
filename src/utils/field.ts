@@ -1,10 +1,7 @@
+
 import * as THREE from 'three'
 
-export const showText = function (_text: string) {
-  console.log(_text)
-}
-
-export const setThree = function (_el: HTMLElement = document.body, innerWidth = 300, innerHeight = 300) {
+export const getViewport = function (_el: HTMLElement = document.body, innerWidth = 300, innerHeight = 300) {
   const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.01, 10)
   camera.position.z = 1
 

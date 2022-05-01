@@ -1,34 +1,70 @@
 <template>
-  <div class="title">
-    <span>
-      CHESS 3d project <br>
-      <button @click="show()">show text</button>
-    </span>
+  <div id="root">
+    <main-menu
+      @open-menu="onSelectMenu"
+    />
+    <field
+      :key="game"
+    />
+    <popup-menu
+      v-if="popupMenu"
+      :p_menu="popupMenu"
+      @close-popup="onClosePopup()"
+      @start-game="onStartGame"
+    />
   </div>
-  <div ref="screen" />
 </template>
 
 <script>
-import { setThree } from '@/main.ts'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
+import MainMenu from '@/components/main-menu.vue'
+import Field from '@/components/field.vue'
+import PopupMenu from '@/components/popup-menu.vue'
 export default {
   name: 'RootElement',
+  components: {
+    MainMenu,
+    Field,
+    PopupMenu,
+  },
   setup() {
-    const screen = ref(null)
-    onMounted(() => {
-      setThree(screen.value)
-    })
+    let popupMenu = ref('')
+    let game = ref('')
 
-    return { screen }
+    const onSelectMenu = (_title) => {
+      popupMenu.value = _title
+    }
+
+    const onClosePopup = () => {
+      popupMenu.value = ''
+    }
+
+    const onStartGame = (_type) => {
+      game.value = _type
+      console.log(game.value)
+    }
+
+    return {
+      onSelectMenu,
+      popupMenu,
+      onClosePopup,
+      onStartGame,
+      game,
+    }
   },
 }
 </script>
 
-<style scoped lang="sass">
-.title {
-  color: white;
-  span {
-    color: green;
-  }
+<style lang="sass">
+BODY {
+  background: gray;
+}
+</style>
+
+<style lang="sass" scoped>
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
