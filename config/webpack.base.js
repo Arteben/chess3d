@@ -78,7 +78,7 @@ module.exports = {
       },
       // static files
       {
-        test: /\.(jpe?g|png|gif|svg|eot|ttf|woff2?)$/i,
+        test: /\.(jpe?g|png|gif|svg|eot|ttf|gltf|woff2?)$/i,
         type: 'asset',
       },
     ],
