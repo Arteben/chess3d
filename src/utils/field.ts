@@ -1,5 +1,6 @@
 
 import * as THREE from 'three'
+import fall from '@/assets/fall.jpg'
 
 export class ChessField {
   camera: THREE.Camera
