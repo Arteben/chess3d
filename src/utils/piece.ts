@@ -1,7 +1,7 @@
 
 import * as THREE from 'three'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-
+import * as pieces from '@/utils/piece-index'
 interface posPiece {
   x: number
   y: number
@@ -17,28 +17,28 @@ export class Piece {
   piece: THREE.Mesh
 
   constructor (_renderer: (p: THREE.Mesh) => void,
-              _gltfPath: string,
+              _gltfName: string,
               _pos: posPiece,
               _isWhite?: boolean,
             ) {
 
     let colors: pieceColors = { color: 0x335555, emissive: 0x000000 }
     if (_isWhite) {
-      colors = { color: 0xdddd99, emissive: 0x333333 }
+      colors = { color: 0xaaaa88, emissive: 0x555555 }
     }
 
     const material = new THREE.MeshStandardMaterial({
       color: new THREE.Color(colors.color),
       emissive : new THREE.Color(colors.emissive),
       metalness: 0.4,
-      roughness: 0.1,
+      roughness: 0.05,
     })
 
     const getPieceGeometry = async function () {
 
       const loadPiece = function () {
         return new Promise<GLTF>((resolve) => {
-          new GLTFLoader().load(_gltfPath, resolve)
+          new GLTFLoader().load(pieces[_gltfName], resolve)
         })
       }
 
@@ -46,7 +46,7 @@ export class Piece {
         console.log('mesh', _chip)
         const mesh = <THREE.Mesh>_chip.scene.children[3]
         const geometry = mesh.geometry.clone()
-        const scaleLevel = 10
+        const scaleLevel = 6
         geometry.scale(scaleLevel, scaleLevel, scaleLevel)
         geometry.rotateX(Math.PI/2)
         geometry.translate(0, 0, -10)
