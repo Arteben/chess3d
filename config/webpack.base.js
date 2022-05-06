@@ -2,7 +2,7 @@ const paths = require('./paths')
 
 const webpack = require('webpack')
 
-// const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 
@@ -78,7 +78,7 @@ module.exports = {
       },
       // static files
       {
-        test: /\.(jpe?g|png|gif|svg|eot|ttf|woff2?)$/i,
+        test: /\.(jpe?g|png|gif|svg|eot|ttf|gltf|woff2?)$/i,
         type: 'asset',
       },
     ],
@@ -87,13 +87,13 @@ module.exports = {
     new VueLoaderPlugin(),
     new webpack.ProgressPlugin(),
 
-    // new CopyWebpackPlugin({
-    //   patterns: [
-    //     {
-    //       from: `${paths.public}/`,
-    //     },
-    //   ],
-    // }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: `${paths.public}/`,
+        },
+      ],
+    }),
 
     new HtmlWebpackPlugin({
       template: 'template.html',

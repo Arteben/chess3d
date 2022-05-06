@@ -1,29 +1,46 @@
 <template>
   <div
-    ref="field"
+    ref="fieldEl"
     class="field"
   />
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'
-import { getViewport } from '@/utils/field.ts'
+import { ref, onMounted, watchEffect } from 'vue'
+import { ChessField } from '@/utils/chess.ts'
 export default {
   name: 'Field',
   components: {},
-  setup() {
-    const field = ref(null)
+  props: {
+    p_game: {
+      type: String,
+      default: '',
+    },
+  },
+  // eslint-disable-next-line no-unused-vars
+  setup(props) {
+    const fieldEl = ref(null)
+    let chessField
+
+    const switchColor = function (_type) {
+      if (_type) {
+        chessField.setBackground()
+      }
+    }
+
     onMounted(() => {
-      getViewport(field.value, 800, 800)
+      chessField = new ChessField(fieldEl.value, 1200, 800)
+      watchEffect(() => switchColor(props.p_game))
     })
-    return { field }
+
+    return { fieldEl }
   },
 }
 </script>
 
 <style scoped lang="sass">
 .field {
-  width: 800px;
+  width: 1200px;
   height: 800px;
   overflow: hidden;
   border-radius: 10px;

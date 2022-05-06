@@ -11,7 +11,7 @@
 
 <script>
 // import { onMounted, ref } from 'vue'
-import { getMainMenuBtns } from '@/utils/common'
+import { getMainMenuBtns } from '@/utils/menuPoints'
 import MainButton from '@/components/button.vue'
 export default {
   name: 'MainMenu',
