@@ -22,7 +22,7 @@ export class Piece {
               _isWhite?: boolean,
             ) {
 
-    let colors: pieceColors = { color: 0x335555, emissive: 0x000000 }
+    let colors: pieceColors = { color: 0x224444, emissive: 0x101010 }
     if (_isWhite) {
       colors = { color: 0xaaaa88, emissive: 0x555555 }
     }
@@ -31,7 +31,7 @@ export class Piece {
       color: new THREE.Color(colors.color),
       emissive : new THREE.Color(colors.emissive),
       metalness: 0.4,
-      roughness: 0.05,
+      roughness: 0.9,
     })
 
     const getPieceGeometry = async function () {
@@ -43,13 +43,11 @@ export class Piece {
       }
 
       const pieceGeometry = await loadPiece().then((_chip)=> {
-        console.log('mesh', _chip)
         const mesh = <THREE.Mesh>_chip.scene.children[3]
         const geometry = mesh.geometry.clone()
         const scaleLevel = 6
         geometry.scale(scaleLevel, scaleLevel, scaleLevel)
-        geometry.rotateX(Math.PI/2)
-        geometry.translate(0, 0, -10)
+        geometry.translate(0, -10, 0)
         return geometry
       })
 
@@ -59,7 +57,7 @@ export class Piece {
     getPieceGeometry().then((_pieceGeometry) => {
       this.piece = new THREE.Mesh(_pieceGeometry, material)
       this.piece.position.setX(_pos.x)
-      this.piece.position.setY(_pos.y)
+      this.piece.position.setZ(_pos.y)
       _renderer(this.piece)
     })
   }
