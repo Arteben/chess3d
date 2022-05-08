@@ -16,8 +16,8 @@ export class Board {
     // function for create box experemental
     const createBox = async function() {
       // 70, 70 width cell 45
-      const geometryBox = new THREE.BoxGeometry(500, 500, 10)
-      geometryBox.translate(250, 250, -10)
+      const geometryBox = new THREE.BoxGeometry(500, 10, 500)
+      geometryBox.translate(250, -10, 250)
 
       const boxMaterial = await loadTexture().then((_texture) => {
         type materials = THREE.MeshBasicMaterial | THREE.MeshStandardMaterial
@@ -33,9 +33,9 @@ export class Board {
 
         cubeMaterialArray.push(colorMaterial)
         cubeMaterialArray.push(colorMaterial)
-        cubeMaterialArray.push(colorMaterial)
-        cubeMaterialArray.push(colorMaterial)
         cubeMaterialArray.push(textureMaterial)
+        cubeMaterialArray.push(colorMaterial)
+        cubeMaterialArray.push(colorMaterial)
         cubeMaterialArray.push(colorMaterial)
 
         return cubeMaterialArray
@@ -47,7 +47,6 @@ export class Board {
     // create box
     createBox().then((_chessTable) => {
       this.board = _chessTable
-      _chessTable.position.z = -2
       _renderer(_chessTable)
     })
   }

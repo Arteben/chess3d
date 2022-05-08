@@ -7,7 +7,7 @@
 
 <script>
 import { ref, onMounted, watchEffect } from 'vue'
-import { ChessField } from '@/utils/chess.ts'
+import { ChessField } from '@/utils/chess-field.ts'
 export default {
   name: 'Field',
   components: {},
@@ -32,6 +32,8 @@ export default {
       chessField = new ChessField(fieldEl.value, 1200, 800)
       watchEffect(() => switchColor(props.p_game))
     })
+
+
 
     return { fieldEl }
   },
