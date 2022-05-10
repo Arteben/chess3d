@@ -1,21 +1,47 @@
 
 import * as THREE from 'three'
-import { BoardSizes, BoardCellSizes, pos3d, verticalRow } from '@/types/common'
+import { BoardSizesType, fieldCellsType, pos3d, verticalRow, cellCoards } from '@/types/common'
 
-interface fieldCell {
-  i: string
-  j: number
+interface selectedCell extends cellCoards {
   // cross: THREE.Mesh
   border: THREE.Mesh
 }
 
+type cellColorsType = {
+  selected: THREE.Color
+  available: THREE.Color
+}
+
+const cellColors: cellColorsType = {
+  selected: new THREE.Color(0xffdd55),
+  available: new THREE.Color(0xFFFFF),
+}
 export class Cells {
 
-  boardCellCenters: BoardCellSizes
+  field: fieldCellsType = {}
+  selectedCells: selectedCell[] = []
 
-  field: fieldCell[]
+  getCell(_coords: cellCoards) {
+    return this.field[_coords.i][_coords.j]
+  }
 
-  constructor(_sizes: BoardSizes) {
+  selectCell (_coords: cellCoards, _type: keyof cellColorsType) {
+    const material = Cells.getMaterial(_coords, this.field)
+    material.opacity = 1
+    material.color = new THREE.Color(cellColors[_type])
+  }
+
+  hideCell (_coords: cellCoards) {
+    const material = Cells.getMaterial(_coords, this.field)
+    material.opacity = 0
+    material.color = new THREE.Color(0x000000)
+  }
+
+  static getMaterial(_coords: cellCoards, _field: fieldCellsType) {
+    return <THREE.MeshBasicMaterial>_field[_coords.i][_coords.j].select.material
+  }
+
+  constructor(_sizes: BoardSizesType, _scene: THREE.Scene) {
 
     const onePr = Math.abs(_sizes.endField.x - _sizes.beginField.x)/_sizes.prWidth
     const cellWidth = ((_sizes.prEnd - _sizes.prBegin)/_sizes.cellCountLine) * onePr
@@ -24,42 +50,44 @@ export class Cells {
       return (_sizes.prBegin * onePr) + (cellWidth * (_idx + 0.5))
     }
 
-    const frameMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffdd55,
-      wireframe: true,
-      wireframeLinewidth: 5,
-      // side: THREE.BackSide,
-    })
+    const selectedCellWidth = cellWidth - 5
+    const selectedGeometry = new THREE.PlaneGeometry(selectedCellWidth, selectedCellWidth, 2, 2)
+    selectedGeometry.rotateX(Math.PI/2)
+    selectedGeometry.translate(0, -9, 0)
 
-    const frameGeometry = new THREE.PlaneGeometry(cellWidth, cellWidth, 2, 2).rotateX(Math.PI/2)
+    const getSelectedFrame = (_pos: pos3d) => {
 
-    const getSelectFrame = (_pos: pos3d) => {
-      const frame = new THREE.Mesh(frameGeometry, frameMaterial)
-      frame.position.set(_pos.x, _pos.y - 4, _pos.z)
+      const frameMaterial = new THREE.MeshBasicMaterial({
+        color: 0x000000,
+        side: THREE.BackSide,
+        opacity: 0,
+        transparent: true,
+        colorWrite: true,
+      })
+
+      frameMaterial.needsUpdate = true
+
+      const frame = new THREE.Mesh(selectedGeometry, frameMaterial)
+      frame.position.set(_pos.x, _pos.y, _pos.z)
+      _scene.add(frame)
       return frame
     }
 
-    this.field = []
-
-    this.boardCellCenters = {}
     _sizes.horsLine.forEach((_el, _idx) => {
       const rowCells: verticalRow = {}
       for (let i = 0; i < _sizes.cellCountLine; i++) {
         const cellCenter = <pos3d>{
           x: getCenterCell(_idx),
           y: _sizes.height,
-          z: getCenterCell(i),
+          z: getCenterCell(_sizes.cellCountLine - i - 1),
         }
 
-        rowCells[i + 1] = cellCenter
-
-        this.field.push({
-          i: _el,
-          j: i + 1,
-          border: getSelectFrame(cellCenter),
-        })
+        rowCells[i + 1] = {
+          center: cellCenter,
+          select: getSelectedFrame(cellCenter),
+        }
       }
-      this.boardCellCenters[_el] = rowCells
+      this.field[_el] = rowCells
     })
   }
 }

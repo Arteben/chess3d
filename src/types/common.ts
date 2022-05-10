@@ -1,5 +1,6 @@
 
-
+import * as THREE from 'three'
+import { Piece } from '@/utils/piece'
 export interface pos2d {
   x: number
   y: number
@@ -11,14 +12,20 @@ export interface pos3d {
   z: number
 }
 
-export interface verticalRow {
-  [index: number]: pos3d
+export interface fieldCellType {
+  center: pos3d
+  select: THREE.Mesh
+  piece?: Piece
+
 }
-export interface BoardCellSizes {
+export interface verticalRow {
+  [index: number]: fieldCellType
+}
+export interface fieldCellsType {
   [index: string]: verticalRow
 }
 
-export interface BoardSizes {
+export interface BoardSizesType {
   prWidth: number
   prBegin: number
   prEnd: number
@@ -27,4 +34,9 @@ export interface BoardSizes {
   height: number
   horsLine: string[]
   cellCountLine: number
+}
+
+export interface cellCoards {
+  i: string
+  j: number
 }
