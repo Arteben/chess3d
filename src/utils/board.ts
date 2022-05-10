@@ -16,8 +16,8 @@ export class Board {
     // function for create box experemental
     const createBox = async function() {
       // 70, 70 width cell 45
-      const geometryBox = new THREE.BoxGeometry(500, 10, 500)
-      geometryBox.translate(250, -10, 250)
+      const geometryBox = new THREE.BoxGeometry(500, 100, 500)
+      geometryBox.translate(250, -60, 250)
 
       const boxMaterial = await loadTexture().then((_texture) => {
         type materials = THREE.MeshBasicMaterial | THREE.MeshStandardMaterial

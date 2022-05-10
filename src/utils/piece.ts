@@ -2,11 +2,7 @@
 import * as THREE from 'three'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as pieces from '@/utils/piece-index'
-interface posPiece {
-  x: number
-  y: number
-}
-
+import { pos2d } from '@/types/common'
 interface pieceColors {
   color: THREE.ColorRepresentation
   emissive: THREE.ColorRepresentation
@@ -18,7 +14,7 @@ export class Piece {
 
   constructor (_renderer: (p: THREE.Mesh) => void,
               _gltfName: string,
-              _pos: posPiece,
+              _pos: pos2d,
               _isWhite?: boolean,
             ) {
 

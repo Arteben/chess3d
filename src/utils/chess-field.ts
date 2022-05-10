@@ -3,6 +3,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Piece } from '@/utils/piece'
 import { Board } from '@/utils/board'
+import { Cells } from './cells'
+import { pos2d, pos3d, BoardSizesType, cellCoards } from '@/types/common'
 
 export class ChessField {
   scene: THREE.Scene
@@ -42,6 +44,22 @@ export class ChessField {
       this.renderer.render( this.scene, this.cam )
     })
 
+    const beginField = <pos2d>{x: 0, y: 0}
+    const endField =  <pos2d>{x: 500, y: 500}
+    const horsLine = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]
+    const boardSizes: BoardSizesType = {
+      prWidth: 1000,
+      prBegin: 135,
+      prEnd: 865,
+      beginField,
+      endField,
+      height: 0,
+      horsLine,
+      cellCountLine: 8,
+    }
+
+    const cells = new Cells(boardSizes, this.scene)
+
     const render = (_piece: THREE.Mesh) => {
       this.scene.add(_piece)
       this.renderer.render(this.scene, this.cam)
@@ -55,10 +73,14 @@ export class ChessField {
         new Piece(render, _type, pos, _isWhite)
     }
 
-    addNewPiece(70, 70, 'pawn', true)
-    addNewPiece(430, 430, 'pawn')
-    addNewPiece(300, 300, 'horse', true)
-    addNewPiece(100, 400, 'rook', true)
-    addNewPiece(320, 140, 'rook')
+    const coords: cellCoards = {i: 'e', j: 2}
+    const coords2: cellCoards = {i: 'd', j: 3}
+    const cell = cells.getCell(coords)
+    addNewPiece(cell.center.x, cell.center.z, 'pawn', true)
+    cells.selectCell(coords, 'available')
+    const cell2 = cells.getCell(coords2)
+    addNewPiece(cell2.center.x, cell2.center.z, 'pawn', true)
+    cells.selectCell(coords2, 'selected')
+
   }
 }
