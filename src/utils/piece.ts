@@ -11,6 +11,10 @@ interface pieceColors {
 export class Piece {
 
   piece: THREE.Mesh
+  setNewPosition(_newPos: pos2d) {
+    this.piece.position.x = _newPos.x
+    this.piece.position.z = _newPos.y
+  }
 
   constructor (_renderer: (p: THREE.Mesh) => void,
               _gltfName: string,

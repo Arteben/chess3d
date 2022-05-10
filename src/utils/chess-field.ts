@@ -68,9 +68,37 @@ export class ChessField {
     // add chess field
     new Board(render)
 
+    //////
+    const raycaster = new THREE.Raycaster()
+    const pointer = new THREE.Vector2()
+    const helpedPlaneGeometry = new THREE.PlaneGeometry(500, 500, 1, 1)
+    helpedPlaneGeometry.rotateX(-Math.PI / 2)
+    helpedPlaneGeometry.translate(250, -40, 250)
+    const helpedPlane = new THREE.Mesh( helpedPlaneGeometry, new THREE.MeshBasicMaterial( { visible: false } ) )
+    // const helpedPlane = new THREE.Mesh( helpedPlaneGeometry, new THREE.MeshBasicMaterial( { visible: false } ) )
+    this.scene.add(helpedPlane)
+
+    const blackRook = new Piece(render, 'rook', {x: 0, y: 0}, true)
+
+    _el.onmousemove = (_event) => {
+      pointer.set(( _event.clientX / _innerWidth ) * 2 - 1, - ( _event.clientY / _innerHeight ) * 2 + 1 )
+      raycaster.setFromCamera(pointer, this.cam)
+      const intersects = raycaster.intersectObjects([helpedPlane], false )
+      if (intersects.length > 0) {
+        console.log('intersects')
+        blackRook.setNewPosition({
+          x: intersects[0].point.x,
+          y: intersects[0].point.z,
+        })
+        this.renderer.render(this.scene, this.cam)
+        console.log(intersects[0].point)
+      }
+    }
+    /////
+
     const addNewPiece = (x: number, y:number, _type: string, _isWhite?: boolean) => {
       const pos = {x, y}
-        new Piece(render, _type, pos, _isWhite)
+      new Piece(render, _type, pos, _isWhite)
     }
 
     const coords: cellCoards = {i: 'e', j: 2}
