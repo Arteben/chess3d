@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Piece } from '@/utils/piece'
 import { Board } from '@/utils/board'
 import { Cells } from './cells'
-import { pos2d, pos3d, BoardSizesType, cellCoards } from '@/types/common'
+import { pos2d, BoardSizesType, cellCoards, coordsMesh } from '@/types/common'
 
 export class ChessField {
   scene: THREE.Scene
@@ -60,6 +60,23 @@ export class ChessField {
 
     const cells = new Cells(boardSizes, this.scene)
 
+    const raycaster = new THREE.Raycaster()
+    const pointer = new THREE.Vector2()
+
+    _el.onmousemove = (_event) => {
+      pointer.set(( _event.clientX / _innerWidth ) * 2 - 1, - ( _event.clientY / _innerHeight ) * 2 + 1 )
+      raycaster.setFromCamera(pointer, this.cam)
+      const intersects = raycaster.intersectObjects(cells.displayed, false )
+      if (intersects.length > 0) {
+        // this.renderer.render(this.scene, this.cam)
+        const object = <coordsMesh>intersects[0].object
+        const coords = { i: <string>object.iCoord, j: <number>object.jCoord }
+        cells.hideAllowedCells()
+        cells.selectCell(coords, 'selected')
+        this.renderer.render(this.scene, this.cam)
+      }
+    }
+
     const render = (_piece: THREE.Mesh) => {
       this.scene.add(_piece)
       this.renderer.render(this.scene, this.cam)
@@ -68,47 +85,9 @@ export class ChessField {
     // add chess field
     new Board(render)
 
-    //////
-    const raycaster = new THREE.Raycaster()
-    const pointer = new THREE.Vector2()
-    const helpedPlaneGeometry = new THREE.PlaneGeometry(500, 500, 1, 1)
-    helpedPlaneGeometry.rotateX(-Math.PI / 2)
-    helpedPlaneGeometry.translate(250, -40, 250)
-    const helpedPlane = new THREE.Mesh( helpedPlaneGeometry, new THREE.MeshBasicMaterial( { visible: false } ) )
-    // const helpedPlane = new THREE.Mesh( helpedPlaneGeometry, new THREE.MeshBasicMaterial( { visible: false } ) )
-    this.scene.add(helpedPlane)
-
-    const blackRook = new Piece(render, 'rook', {x: 0, y: 0}, true)
-
-    _el.onmousemove = (_event) => {
-      pointer.set(( _event.clientX / _innerWidth ) * 2 - 1, - ( _event.clientY / _innerHeight ) * 2 + 1 )
-      raycaster.setFromCamera(pointer, this.cam)
-      const intersects = raycaster.intersectObjects([helpedPlane], false )
-      if (intersects.length > 0) {
-        console.log('intersects')
-        blackRook.setNewPosition({
-          x: intersects[0].point.x,
-          y: intersects[0].point.z,
-        })
-        this.renderer.render(this.scene, this.cam)
-        console.log(intersects[0].point)
-      }
-    }
-    /////
-
-    const addNewPiece = (x: number, y:number, _type: string, _isWhite?: boolean) => {
-      const pos = {x, y}
-      new Piece(render, _type, pos, _isWhite)
-    }
-
-    const coords: cellCoards = {i: 'e', j: 2}
-    const coords2: cellCoards = {i: 'd', j: 3}
-    const cell = cells.getCell(coords)
-    addNewPiece(cell.center.x, cell.center.z, 'pawn', true)
-    cells.selectCell(coords, 'available')
-    const cell2 = cells.getCell(coords2)
-    addNewPiece(cell2.center.x, cell2.center.z, 'pawn', true)
-    cells.selectCell(coords2, 'selected')
-
+    // const addNewPiece = (x: number, y:number, _type: string, _isWhite?: boolean) => {
+    //   const pos = {x, y}
+    //   new Piece(render, _type, pos, _isWhite)
+    // }
   }
 }

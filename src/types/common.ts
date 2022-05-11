@@ -12,11 +12,16 @@ export interface pos3d {
   z: number
 }
 
+export interface coordsMesh extends THREE.Mesh {
+  iCoord?: string
+  jCoord?: number
+}
+
 export interface fieldCellType {
   center: pos3d
-  select: THREE.Mesh
+  sign: THREE.Mesh
+  frame: coordsMesh
   piece?: Piece
-
 }
 export interface verticalRow {
   [index: number]: fieldCellType
