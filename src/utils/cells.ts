@@ -1,11 +1,5 @@
-
 import * as THREE from 'three'
-import { BoardSizesType, fieldCellsType, pos3d, verticalRow, cellCoards } from '@/types/common'
-
-interface selectedCell extends cellCoards {
-  // cross: THREE.Mesh
-  border: THREE.Mesh
-}
+import { BoardSizesType, fieldCellsType, pos3d, verticalRow, coordsMesh, cellCoards } from '@/types/common'
 
 type cellColorsType = {
   selected: THREE.Color
@@ -19,26 +13,36 @@ const cellColors: cellColorsType = {
 export class Cells {
 
   field: fieldCellsType = {}
-  selectedCells: selectedCell[] = []
+  displayed: coordsMesh[] = []
 
   getCell(_coords: cellCoards) {
     return this.field[_coords.i][_coords.j]
   }
 
   selectCell (_coords: cellCoards, _type: keyof cellColorsType) {
-    const material = Cells.getMaterial(_coords, this.field)
-    material.opacity = 1
+    const mesh = Cells.getMesh(_coords, this.field)
+    mesh.visible = true
+    const material = <THREE.MeshBasicMaterial>mesh.material
     material.color = new THREE.Color(cellColors[_type])
   }
 
   hideCell (_coords: cellCoards) {
-    const material = Cells.getMaterial(_coords, this.field)
-    material.opacity = 0
-    material.color = new THREE.Color(0x000000)
+    const mesh = Cells.getMesh(_coords, this.field)
+    mesh.visible = false
   }
 
-  static getMaterial(_coords: cellCoards, _field: fieldCellsType) {
-    return <THREE.MeshBasicMaterial>_field[_coords.i][_coords.j].select.material
+  hideAllowedCells () {
+    this.displayed.forEach((_el: THREE.Mesh) => {
+      const frame = <coordsMesh>_el
+      this.hideCell({
+        i: <string>frame.iCoord,
+        j: <number>frame.jCoord,
+      })
+    })
+  }
+
+  static getMesh(_coords: cellCoards, _field: fieldCellsType) {
+    return <THREE.Mesh>_field[_coords.i][_coords.j].sign
   }
 
   constructor(_sizes: BoardSizesType, _scene: THREE.Scene) {
@@ -50,25 +54,28 @@ export class Cells {
       return (_sizes.prBegin * onePr) + (cellWidth * (_idx + 0.5))
     }
 
-    const selectedCellWidth = cellWidth - 5
-    const selectedGeometry = new THREE.PlaneGeometry(selectedCellWidth, selectedCellWidth, 2, 2)
-    selectedGeometry.rotateX(Math.PI/2)
-    selectedGeometry.translate(0, -9, 0)
+    const signCellWidth = cellWidth - 5
+    const signGeometry = new THREE.PlaneGeometry(signCellWidth, signCellWidth, 2, 2)
+    signGeometry.rotateX(Math.PI/2)
+    signGeometry.translate(0, -9, 0)
 
-    const getSelectedFrame = (_pos: pos3d) => {
-
-      const frameMaterial = new THREE.MeshBasicMaterial({
-        color: 0x000000,
+    const getSignMesh = (_pos: pos3d) => {
+      const signMaterial = new THREE.MeshBasicMaterial({
         side: THREE.BackSide,
-        opacity: 0,
-        transparent: true,
-        colorWrite: true,
       })
 
-      frameMaterial.needsUpdate = true
+      const sign = new THREE.Mesh(signGeometry, signMaterial)
+      sign.position.set(_pos.x, _pos.y, _pos.z)
+      sign.visible = false
+      _scene.add(sign)
+      return sign
+    }
 
-      const frame = new THREE.Mesh(selectedGeometry, frameMaterial)
-      frame.position.set(_pos.x, _pos.y, _pos.z)
+    const frameMaterial = new THREE.MeshBasicMaterial({side: THREE.BackSide, visible: false})
+
+    const getFrameMesh = (_pos: pos3d) => {
+      const frame = <coordsMesh>new THREE.Mesh(signGeometry,frameMaterial)
+      frame.position.set(_pos.x, _pos.y + 10, _pos.z)
       _scene.add(frame)
       return frame
     }
@@ -82,10 +89,19 @@ export class Cells {
           z: getCenterCell(_sizes.cellCountLine - i - 1),
         }
 
-        rowCells[i + 1] = {
+        const sign = getSignMesh(cellCenter)
+        const frame = getFrameMesh({...cellCenter, y: _sizes.height - 40})
+        frame.iCoord = _el
+        frame.jCoord = i + 1
+
+        rowCells[frame.jCoord] = {
           center: cellCenter,
-          select: getSelectedFrame(cellCenter),
+          sign,
+          frame,
         }
+
+        this.displayed.push(frame)
+
       }
       this.field[_el] = rowCells
     })
