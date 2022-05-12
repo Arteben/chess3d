@@ -1,7 +1,7 @@
 
 import * as THREE from 'three'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import * as pieces from '@/utils/piece-index'
+import * as pieces from '@/utils/pieces-index'
 import { pos2d } from '@/types/common'
 interface pieceColors {
   color: THREE.ColorRepresentation
