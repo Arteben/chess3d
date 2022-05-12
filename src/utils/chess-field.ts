@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Piece } from '@/utils/piece'
 import { Board } from '@/utils/board'
 import { Cells } from './cells'
-import { pos2d, BoardSizesType, cellCoards, coordsMesh } from '@/types/common'
+import { pos2d, BoardSizesType, coordsMesh } from '@/types/common'
 
 export class ChessField {
   scene: THREE.Scene
@@ -44,8 +44,8 @@ export class ChessField {
       this.renderer.render( this.scene, this.cam )
     })
 
-    const beginField = <pos2d>{x: 0, y: 0}
-    const endField =  <pos2d>{x: 500, y: 500}
+    const beginField = <pos2d>{x: 0, z: 0}
+    const endField =  <pos2d>{x: 500, z: 500}
     const horsLine = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]
     const boardSizes: BoardSizesType = {
       prWidth: 1000,
@@ -57,6 +57,12 @@ export class ChessField {
       horsLine,
       cellCountLine: 8,
     }
+
+    // add chess field
+    new Board((_board: THREE.Mesh) => {
+      this.scene.add(_board)
+      this.renderer.render(this.scene, this.cam)
+    })
 
     const cells = new Cells(boardSizes, this.scene)
 
@@ -77,17 +83,8 @@ export class ChessField {
       }
     }
 
-    const render = (_piece: THREE.Mesh) => {
-      this.scene.add(_piece)
-      this.renderer.render(this.scene, this.cam)
-    }
-
-    // add chess field
-    new Board(render)
-
-    // const addNewPiece = (x: number, y:number, _type: string, _isWhite?: boolean) => {
-    //   const pos = {x, y}
-    //   new Piece(render, _type, pos, _isWhite)
-    // }
+    Piece.createPieceSets(this.scene).then((pieces: Piece[]) => {
+      pieces[0].setPosition({x: 300, z: 300})
+    })
   }
 }

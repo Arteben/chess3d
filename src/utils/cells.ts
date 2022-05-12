@@ -75,7 +75,7 @@ export class Cells {
 
     const getFrameMesh = (_pos: pos3d) => {
       const frame = <coordsMesh>new THREE.Mesh(signGeometry,frameMaterial)
-      frame.position.set(_pos.x, _pos.y + 10, _pos.z)
+      frame.position.set(_pos.x, _pos.y, _pos.z)
       _scene.add(frame)
       return frame
     }
@@ -89,8 +89,8 @@ export class Cells {
           z: getCenterCell(_sizes.cellCountLine - i - 1),
         }
 
-        const sign = getSignMesh(cellCenter)
-        const frame = getFrameMesh({...cellCenter, y: _sizes.height - 40})
+        const sign = getSignMesh({...cellCenter})
+        const frame = getFrameMesh({...cellCenter, y: _sizes.height - 30})
         frame.iCoord = _el
         frame.jCoord = i + 1
 

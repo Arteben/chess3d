@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { Piece } from '@/utils/piece'
 export interface pos2d {
   x: number
-  y: number
+  z: number
 }
 
 export interface pos3d {

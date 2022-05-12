@@ -11,16 +11,55 @@ interface pieceColors {
 export class Piece {
 
   piece: THREE.Mesh
-  setNewPosition(_newPos: pos2d) {
-    this.piece.position.x = _newPos.x
-    this.piece.position.z = _newPos.y
+  isWhite: boolean
+  type: string
+
+  setPosition(_position: pos2d) {
+    this.piece.position.setX(_position.x)
+    this.piece.position.setZ(_position.z)
   }
 
-  constructor (_renderer: (p: THREE.Mesh) => void,
+  static createPieceSets(_scene: THREE.Scene) {
+    return new Promise((_resolve) => {
+      let piecesCount = 32
+      const pieces: Piece[] = []
+
+      const resolveCreate = (_piece: Piece) => {
+        _scene.add(_piece.piece)
+        piecesCount--
+        pieces.push(_piece)
+        if (piecesCount === 0) {
+          _resolve(pieces)
+        }
+      }
+
+      const getPieses = (_type: string, _isWhite: boolean, _count = 2) => {
+        for (let i = 0; i < _count; i++) {
+          new Piece(resolveCreate, _type, _isWhite)
+        }
+      }
+
+      const getPlayerSet = (_isWhite) => {
+        getPieses('pawn', _isWhite, 8)
+        getPieses('horse', _isWhite)
+        getPieses('elephant', _isWhite)
+        getPieses('rook', _isWhite)
+        new Piece(resolveCreate, 'king', _isWhite)
+        new Piece(resolveCreate, 'queen', _isWhite)
+      }
+
+      getPlayerSet(true)
+      getPlayerSet(false)
+    })
+  }
+
+  constructor (_resolve: (_p: Piece) => void,
               _gltfName: string,
-              _pos: pos2d,
               _isWhite?: boolean,
             ) {
+
+    this.isWhite = Boolean(_isWhite)
+    this.type = _gltfName
 
     let colors: pieceColors = { color: 0x224444, emissive: 0x101010 }
     if (_isWhite) {
@@ -35,7 +74,6 @@ export class Piece {
     })
 
     const getPieceGeometry = async function () {
-
       const loadPiece = function () {
         return new Promise<GLTF>((resolve) => {
           new GLTFLoader().load(pieces[_gltfName], resolve)
@@ -56,9 +94,7 @@ export class Piece {
 
     getPieceGeometry().then((_pieceGeometry) => {
       this.piece = new THREE.Mesh(_pieceGeometry, material)
-      this.piece.position.setX(_pos.x)
-      this.piece.position.setZ(_pos.y)
-      _renderer(this.piece)
+      _resolve(this)
     })
   }
 }
