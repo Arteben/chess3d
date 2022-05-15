@@ -3,8 +3,9 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Piece } from '@/utils/piece'
 import { Board } from '@/utils/board'
-import { Cells } from './cells'
+import { Cells } from '@/utils/cells'
 import { pos2d, BoardSizesType, coordsMesh } from '@/types/common'
+import { ChessEngine } from '@/utils/chess-engine'
 
 export class ChessField {
   scene: THREE.Scene
@@ -12,6 +13,9 @@ export class ChessField {
   chessTable: THREE.Mesh
   cam: THREE.Camera
   controls: OrbitControls
+  render () {
+    this.renderer.render(this.scene, this.cam)
+  }
 
   constructor (_el: HTMLElement = document.body, _innerWidth = 300, _innerHeight = 300) {
 
@@ -41,12 +45,12 @@ export class ChessField {
     this.controls.minDistance = 1000
 
     this.controls.addEventListener('change', () => {
-      this.renderer.render( this.scene, this.cam )
+      this.render()
     })
 
     const beginField = <pos2d>{x: 0, z: 0}
     const endField =  <pos2d>{x: 500, z: 500}
-    const horsLine = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ]
+    const horsLine = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' ]
     const boardSizes: BoardSizesType = {
       prWidth: 1000,
       prBegin: 135,
@@ -61,30 +65,29 @@ export class ChessField {
     // add chess field
     new Board((_board: THREE.Mesh) => {
       this.scene.add(_board)
-      this.renderer.render(this.scene, this.cam)
+      this.render()
     })
 
-    const cells = new Cells(boardSizes, this.scene)
 
     const raycaster = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
+    const cells = new Cells(boardSizes, this.scene, () => {
+      this.render()
+    })
 
     _el.onmousemove = (_event) => {
       pointer.set(( _event.clientX / _innerWidth ) * 2 - 1, - ( _event.clientY / _innerHeight ) * 2 + 1 )
       raycaster.setFromCamera(pointer, this.cam)
-      const intersects = raycaster.intersectObjects(cells.displayed, false )
-      if (intersects.length > 0) {
-        // this.renderer.render(this.scene, this.cam)
-        const object = <coordsMesh>intersects[0].object
-        const coords = { i: <string>object.iCoord, j: <number>object.jCoord }
-        cells.hideAllowedCells()
-        cells.selectCell(coords, 'selected')
-        this.renderer.render(this.scene, this.cam)
-      }
+      cells.calcSelectedCell(raycaster)
     }
 
-    Piece.createPieceSets(this.scene).then((pieces: Piece[]) => {
-      pieces[0].setPosition({x: 300, z: 300})
+    const engine = new ChessEngine(cells)
+    const pieceSets = engine.getConf().pieces
+
+    Piece.createPieces(pieceSets, this.scene, cells, () => {
+      this.render()
+    }).then(() => {
+      engine.start()
     })
   }
 }

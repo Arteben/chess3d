@@ -45,3 +45,5 @@ export interface cellCoards {
   i: string
   j: number
 }
+
+export type pieces = {[index: string]: string}

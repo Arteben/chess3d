@@ -2,10 +2,20 @@
 import * as THREE from 'three'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as pieces from '@/utils/pieces-index'
-import { pos2d } from '@/types/common'
+import { pos2d, pieces as piecesType } from '@/types/common'
+import { Cells } from '@/utils/cells'
 interface pieceColors {
   color: THREE.ColorRepresentation
   emissive: THREE.ColorRepresentation
+}
+
+enum shortPieceBlackNames {
+  'p' = 'pawn',
+  'n' = 'horse',
+  'b' = 'elephant',
+  'r' = 'rook',
+  'q' = 'queen',
+  'k' = 'king'
 }
 
 export class Piece {
@@ -13,55 +23,56 @@ export class Piece {
   piece: THREE.Mesh
   isWhite: boolean
   type: string
+  startPosition: pos2d
 
   setPosition(_position: pos2d) {
     this.piece.position.setX(_position.x)
     this.piece.position.setZ(_position.z)
   }
 
-  static createPieceSets(_scene: THREE.Scene) {
-    return new Promise((_resolve) => {
-      let piecesCount = 32
-      const pieces: Piece[] = []
+  static createPieces(_pieceSet: piecesType,
+                      _scene: THREE.Scene,
+                      _cells: Cells,
+                      _render: () => void) {
 
+    const hasUpperCase = (_str: string) => {
+      return String(_str).toUpperCase() == _str
+    }
+
+    return new Promise((_resolve) => {
+      let piecesCount = Object.keys(_pieceSet).length
       const resolveCreate = (_piece: Piece) => {
+        _piece.setPosition({x: _piece.startPosition.x, z: _piece.startPosition.z})
         _scene.add(_piece.piece)
         piecesCount--
-        pieces.push(_piece)
         if (piecesCount === 0) {
-          _resolve(pieces)
+          _render()
+          _resolve('ok')
         }
       }
 
-      const getPieses = (_type: string, _isWhite: boolean, _count = 2) => {
-        for (let i = 0; i < _count; i++) {
-          new Piece(resolveCreate, _type, _isWhite)
-        }
+      for (const [strCoords, typePiece] of Object.entries(_pieceSet)) {
+        const isWhite = hasUpperCase(typePiece)
+        const type = shortPieceBlackNames[String(typePiece).toLowerCase()]
+        const cell = _cells.field[strCoords[0]][Number(strCoords[1])]
+        const startPosition = {x: cell.center.x, z: cell.center.z}
+        const piece = new Piece(resolveCreate, type, startPosition, isWhite)
+        cell.piece = piece
       }
-
-      const getPlayerSet = (_isWhite) => {
-        getPieses('pawn', _isWhite, 8)
-        getPieses('horse', _isWhite)
-        getPieses('elephant', _isWhite)
-        getPieses('rook', _isWhite)
-        new Piece(resolveCreate, 'king', _isWhite)
-        new Piece(resolveCreate, 'queen', _isWhite)
-      }
-
-      getPlayerSet(true)
-      getPlayerSet(false)
     })
   }
 
   constructor (_resolve: (_p: Piece) => void,
               _gltfName: string,
+              _startPosition: pos2d,
               _isWhite?: boolean,
             ) {
 
     this.isWhite = Boolean(_isWhite)
     this.type = _gltfName
+    this.startPosition = _startPosition
 
-    let colors: pieceColors = { color: 0x224444, emissive: 0x101010 }
+    let colors: pieceColors = { color: 0x669977, emissive: 0x000000 }
     if (_isWhite) {
       colors = { color: 0xaaaa88, emissive: 0x555555 }
     }
