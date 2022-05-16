@@ -1,19 +1,30 @@
 import * as THREE from 'three'
-import { BoardSizesType, fieldCellsType, pos3d, verticalRow, coordsMesh, cellCoards } from '@/types/common'
+import {
+  BoardSizesType,
+  fieldCellsType,
+  pos3d,
+  verticalRow,
+  coordsMesh,
+  cellCoards,
+  playerStates,
+} from '@/types/common'
 
 type cellColorsType = {
   selected: THREE.Color
   available: THREE.Color
+  captured: THREE.Color
 }
 
 const cellColors: cellColorsType = {
   selected: new THREE.Color(0xffdd55),
   available: new THREE.Color(0xFFFFF),
+  captured: new THREE.Color(0x33AA55),
 }
 export class Cells {
 
   field: fieldCellsType = {}
   displayed: coordsMesh[] = []
+
   render: () => void
 
   getCell(_coords: cellCoards) {
@@ -25,6 +36,7 @@ export class Cells {
     mesh.visible = true
     const material = <THREE.MeshBasicMaterial>mesh.material
     material.color = new THREE.Color(cellColors[_type])
+    this.render()
   }
 
   hideCell (_coords: cellCoards) {
@@ -33,44 +45,44 @@ export class Cells {
   }
 
   hideAllowedCells () {
-    this.displayed.forEach((_el: THREE.Mesh) => {
-      const frame = <coordsMesh>_el
-      this.hideCell({
-        i: <string>frame.iCoord,
-        j: <number>frame.jCoord,
+    this.onSelectCell()
+
+    if (this.displayed.length > 0) {
+      this.displayed.forEach((_el: THREE.Mesh) => {
+        const frame = <coordsMesh>_el
+        this.hideCell({
+          i: <string>frame.iCoord,
+          j: <number>frame.jCoord,
+        })
       })
-    })
-  }
 
-  calcSelectedCell(_raycaster: THREE.Raycaster) {
-    const intersects = _raycaster.intersectObjects(this.displayed, false )
-    this.hideAllowedCells()
-    if (intersects.length > 0) {
-      const object = <coordsMesh>intersects[0].object
-      const coords = { i: <string>object.iCoord, j: <number>object.jCoord }
-      this.onSelectCell(coords)
+      this.render()
     }
-    this.render()
   }
 
-  onSelectCell (_coords: cellCoards) {
-    this.selectCell(_coords, 'selected')
+  onSelectCell (_playerState?: playerStates, i?: string, j?: number) {
+    if (i) {
+      const coords: cellCoards = {
+        i: <string>i,
+        j: <number>j,
+      }
+      this.selectCell(coords, 'selected')
+    }
   }
 
   static getMesh(_coords: cellCoards, _field: fieldCellsType) {
     return <THREE.Mesh>_field[_coords.i][_coords.j].sign
   }
 
-  constructor(_sizes: BoardSizesType, _scene: THREE.Scene, _render: () => void) {
-
-    this.render = _render
-
+  constructor(_sizes: BoardSizesType, _scene: THREE.Scene, _render: ()=> void) {
     const onePr = Math.abs(_sizes.endField.x - _sizes.beginField.x)/_sizes.prWidth
     const cellWidth = ((_sizes.prEnd - _sizes.prBegin)/_sizes.cellCountLine) * onePr
 
     const getCenterCell = (_idx) => {
       return (_sizes.prBegin * onePr) + (cellWidth * (_idx + 0.5))
     }
+
+    this.render = _render
 
     const signCellWidth = cellWidth - 5
     const signGeometry = new THREE.PlaneGeometry(signCellWidth, signCellWidth, 2, 2)

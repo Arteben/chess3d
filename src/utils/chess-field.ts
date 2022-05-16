@@ -65,23 +65,30 @@ export class ChessField {
     // add chess field
     new Board((_board: THREE.Mesh) => {
       this.scene.add(_board)
-      this.render()
     })
 
 
     const raycaster = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
-    const cells = new Cells(boardSizes, this.scene, () => {
-      this.render()
-    })
+    const cells = new Cells(boardSizes, this.scene, () => { this.render() })
+    const engine = new ChessEngine(cells)
+
 
     _el.onmousemove = (_event) => {
       pointer.set(( _event.clientX / _innerWidth ) * 2 - 1, - ( _event.clientY / _innerHeight ) * 2 + 1 )
       raycaster.setFromCamera(pointer, this.cam)
-      cells.calcSelectedCell(raycaster)
+      const intersects = raycaster.intersectObjects(cells.displayed, false )
+      cells.hideAllowedCells()
+      if (intersects.length > 0) {
+        const object = <coordsMesh>intersects[0].object
+        cells.onSelectCell(engine.playerState, object.iCoord, object.jCoord)
+      }
     }
 
-    const engine = new ChessEngine(cells)
+    _el.onclick = () => {
+      engine.clickEvent()
+    }
+
     const pieceSets = engine.getConf().pieces
 
     Piece.createPieces(pieceSets, this.scene, cells, () => {
