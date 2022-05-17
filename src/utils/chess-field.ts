@@ -75,18 +75,21 @@ export class ChessField {
 
 
     _el.onmousemove = (_event) => {
-      pointer.set(( _event.clientX / _innerWidth ) * 2 - 1, - ( _event.clientY / _innerHeight ) * 2 + 1 )
-      raycaster.setFromCamera(pointer, this.cam)
-      const intersects = raycaster.intersectObjects(cells.displayed, false )
-      cells.hideAllowedCells()
-      if (intersects.length > 0) {
-        const object = <coordsMesh>intersects[0].object
-        cells.onSelectCell(engine.playerState, object.iCoord, object.jCoord)
+      engine.onSelectCell()
+      if (engine.interCells.length > 0) {
+        pointer.set((_event.clientX / _innerWidth) * 2 - 1, - (_event.clientY / _innerHeight) * 2 + 1)
+        raycaster.setFromCamera(pointer, this.cam)
+        const intersects = raycaster.intersectObjects(engine.interCells, false)
+        cells.hideAllowedCells(engine.interCells)
+        if (intersects.length > 0) {
+          const object = <coordsMesh>intersects[0].object
+          engine.onSelectCell(object.iCoord, object.jCoord)
+        }
       }
     }
 
     _el.onclick = () => {
-      engine.clickEvent()
+      engine.onClickEvent()
     }
 
     const pieceSets = engine.getConf().pieces

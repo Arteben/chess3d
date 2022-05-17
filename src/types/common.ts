@@ -48,4 +48,3 @@ export interface cellCoards {
 
 export type pieces = {[index: string]: string}
 
-export enum playerStates { pieceSearch, cuptureMove, none }

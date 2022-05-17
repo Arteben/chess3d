@@ -6,7 +6,6 @@ import {
   verticalRow,
   coordsMesh,
   cellCoards,
-  playerStates,
 } from '@/types/common'
 
 type cellColorsType = {
@@ -18,12 +17,11 @@ type cellColorsType = {
 const cellColors: cellColorsType = {
   selected: new THREE.Color(0xffdd55),
   available: new THREE.Color(0xFFFFF),
-  captured: new THREE.Color(0x33AA55),
+  captured: new THREE.Color(0x66FF66),
 }
 export class Cells {
 
   field: fieldCellsType = {}
-  displayed: coordsMesh[] = []
 
   render: () => void
 
@@ -44,30 +42,14 @@ export class Cells {
     mesh.visible = false
   }
 
-  hideAllowedCells () {
-    this.onSelectCell()
-
-    if (this.displayed.length > 0) {
-      this.displayed.forEach((_el: THREE.Mesh) => {
-        const frame = <coordsMesh>_el
-        this.hideCell({
-          i: <string>frame.iCoord,
-          j: <number>frame.jCoord,
-        })
+  hideAllowedCells (_displayed: coordsMesh[]) {
+    _displayed.forEach((_el: coordsMesh) => {
+      this.hideCell({
+        i: <string>_el.iCoord,
+        j: <number>_el.jCoord,
       })
-
-      this.render()
-    }
-  }
-
-  onSelectCell (_playerState?: playerStates, i?: string, j?: number) {
-    if (i) {
-      const coords: cellCoards = {
-        i: <string>i,
-        j: <number>j,
-      }
-      this.selectCell(coords, 'selected')
-    }
+    })
+    this.render()
   }
 
   static getMesh(_coords: cellCoards, _field: fieldCellsType) {
