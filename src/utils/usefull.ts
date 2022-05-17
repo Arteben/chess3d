@@ -1,4 +1,4 @@
-import { cellCoards } from '@/types/common'
+import { cellCoards, coordsMesh } from '@/types/common'
 
 export const getCoordsStr = (_str: string) => {
   return <cellCoards>{
@@ -28,4 +28,11 @@ export const cachingDecoratorSimple = function (func: any) {
 
     return result
   }
+}
+
+export const getMeshCoords = (_meshCoords: coordsMesh) => {
+    return <cellCoards>{
+      i: <string>_meshCoords.iCoord || 'A',
+      j: <number>_meshCoords.jCoord || 1,
+    }
 }

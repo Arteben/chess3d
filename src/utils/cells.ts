@@ -7,6 +7,8 @@ import {
   coordsMesh,
   cellCoards,
 } from '@/types/common'
+import { getMeshCoords } from '@/utils/usefull'
+import { ChessEngine } from '@/utils/chess-engine'
 
 type cellColorsType = {
   selected: THREE.Color
@@ -29,26 +31,46 @@ export class Cells {
     return this.field[_coords.i][_coords.j]
   }
 
-  selectCell (_coords: cellCoards, _type: keyof cellColorsType) {
+  selectCell (_coords: cellCoards,
+              _type: keyof cellColorsType,
+              _isRender = true ) {
     const mesh = Cells.getMesh(_coords, this.field)
     mesh.visible = true
     const material = <THREE.MeshBasicMaterial>mesh.material
     material.color = new THREE.Color(cellColors[_type])
-    this.render()
+    if (_isRender) {
+      this.render()
+    }
   }
 
-  hideCell (_coords: cellCoards) {
+  hideCell (_coords: cellCoards, _isRender = true) {
     const mesh = Cells.getMesh(_coords, this.field)
     mesh.visible = false
+
+    if (_isRender) {
+      this.render()
+    }
   }
 
-  hideAllowedCells (_displayed: coordsMesh[]) {
-    _displayed.forEach((_el: coordsMesh) => {
-      this.hideCell({
-        i: <string>_el.iCoord,
-        j: <number>_el.jCoord,
-      })
+  hideAllowedCells ( _game: ChessEngine) {
+
+    _game.interCells.forEach((_el: coordsMesh) => {
+      this.hideCell(getMeshCoords(_el), false)
     })
+
+    if (_game.selectedCell) {
+      this.hideCell(_game.selectedCell, false)
+      _game.selectedCell = null
+    }
+
+    _game.lightedCells.forEach((_el) => {
+      this.selectCell(getMeshCoords(_el), 'available', false)
+    })
+
+    if(_game.cupturedCell) {
+      this.selectCell(_game.cupturedCell, 'captured', false)
+    }
+
     this.render()
   }
 

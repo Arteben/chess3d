@@ -75,15 +75,14 @@ export class ChessField {
 
 
     _el.onmousemove = (_event) => {
-      engine.onSelectCell()
-      if (engine.interCells.length > 0) {
+      if (engine.interCells.length) {
         pointer.set((_event.clientX / _innerWidth) * 2 - 1, - (_event.clientY / _innerHeight) * 2 + 1)
         raycaster.setFromCamera(pointer, this.cam)
         const intersects = raycaster.intersectObjects(engine.interCells, false)
-        cells.hideAllowedCells(engine.interCells)
+        cells.hideAllowedCells(engine)
         if (intersects.length > 0) {
           const object = <coordsMesh>intersects[0].object
-          engine.onSelectCell(object.iCoord, object.jCoord)
+          engine.onSelectCell(<string>object.iCoord, <number>object.jCoord)
         }
       }
     }

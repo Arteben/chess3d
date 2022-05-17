@@ -12,6 +12,11 @@ export interface pos3d {
   z: number
 }
 
+export interface cellCoards {
+  i: string
+  j: number
+}
+
 export interface coordsMesh extends THREE.Mesh {
   iCoord?: string
   jCoord?: number
@@ -39,11 +44,6 @@ export interface BoardSizesType {
   height: number
   horsLine: string[]
   cellCountLine: number
-}
-
-export interface cellCoards {
-  i: string
-  j: number
 }
 
 export type pieces = {[index: string]: string}
