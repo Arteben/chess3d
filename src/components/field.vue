@@ -29,7 +29,7 @@ export default {
     }
 
     onMounted(() => {
-      chessField = new ChessField(fieldEl.value, 1200, 800)
+      chessField = new ChessField(fieldEl.value, 1200, 600)
       watchEffect(() => switchColor(props.p_game))
     })
 
@@ -43,7 +43,7 @@ export default {
 <style scoped lang="sass">
 .field {
   width: 1200px;
-  height: 800px;
+  height: 600px;
   overflow: hidden;
   border-radius: 10px;
   outline: 5px solid green;
