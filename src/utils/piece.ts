@@ -72,9 +72,9 @@ export class Piece {
     this.type = _gltfName
     this.startPosition = _startPosition
 
-    let colors: pieceColors = { color: 0x669977, emissive: 0x000000 }
+    let colors: pieceColors = { color: 0x66AA77, emissive: 0x000000 }
     if (_isWhite) {
-      colors = { color: 0xaaaa88, emissive: 0x555555 }
+      colors = { color: 0x999977, emissive: 0x555555 }
     }
 
     const material = new THREE.MeshStandardMaterial({

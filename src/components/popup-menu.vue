@@ -14,12 +14,12 @@
           class="btn"
           @click-btn="startGame(game)"
         />
-        <hr>
+        <!-- <hr>
         <my-button
           class="btn"
           p_title="save game"
           @click-btn="saveLoadGame()"
-        />
+        /> -->
       </template>
       <template v-else>
         settings

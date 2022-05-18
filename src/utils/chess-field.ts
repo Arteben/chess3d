@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Piece } from '@/utils/piece'
 import { Board } from '@/utils/board'
 import { Cells } from '@/utils/cells'
-import { pos2d, BoardSizesType, coordsMesh } from '@/types/common'
+import { pos2d, BoardSizesType } from '@/types/common'
 import { ChessEngine } from '@/utils/chess-engine'
 
 export class ChessField {
@@ -12,12 +12,52 @@ export class ChessField {
   renderer: THREE.WebGLRenderer
   chessTable: THREE.Mesh
   cam: THREE.Camera
+  engine: ChessEngine
   controls: OrbitControls
+  canvas: HTMLElement
+  canvasW: number
+  canvasH: number
+
+  isFieldReady = false
+
+  setEngineEvents () {
+    const engine = this.engine
+    this.canvas.onmousemove = (_ev) => {
+      engine.onMoveEvents(_ev)
+    }
+    this.canvas.onclick = () => {
+      engine.onClickEvent()
+    }
+  }
+
+  setPlayerCam (_type: string) {
+    switch (_type) {
+      case 'white':
+        this.cam.position.set(250, 650, 1500)
+        break
+      case 'black':
+        this.cam.position.set(250, 650, -1500)
+    }
+    this.controls.update()
+  }
+
   render () {
     this.renderer.render(this.scene, this.cam)
   }
 
+  startNewGame (_type: string) {
+    if (this.isFieldReady) {
+      this.controls.autoRotate = false
+      this.setEngineEvents()
+      this.setPlayerCam(_type)
+      this.engine.start(_type)
+    }
+  }
+
   constructor (_el: HTMLElement = document.body, _innerWidth = 300, _innerHeight = 300) {
+    this.canvas = _el
+    this.canvasW = _innerWidth
+    this.canvasH = _innerHeight
 
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color(0x333)
@@ -29,16 +69,30 @@ export class ChessField {
     this.scene.add(spotLight)
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true })
-    this.renderer.setSize(_innerWidth, _innerHeight)
+    this.renderer.setSize(this.canvasW, this.canvasH)
     _el.appendChild(this.renderer.domElement)
 
-    const aspect = _innerWidth/_innerHeight
-    this.cam = new THREE.PerspectiveCamera(16, aspect, 1, 10000)
+    const aspect = this.canvasW/this.canvasH
+    this.cam = new THREE.PerspectiveCamera(15, aspect, 1, 5000)
     this.controls = new OrbitControls(this.cam, this.renderer.domElement)
     this.controls.target = new THREE.Vector3(250, 10, 250)
     // if (_white)
-    this.cam.position.set(1200, 650, 0)
+    this.cam.position.set(1400, 650, 250)
     this.controls.update()
+
+    this.controls.autoRotateSpeed = 1
+    this.controls.autoRotate = true
+
+    const animateSpin = () => {
+      if (this.controls.autoRotate) {
+        window.requestAnimationFrame(animateSpin)
+        this.controls.update()
+        this.render()
+      }
+    }
+
+    animateSpin()
+
     this.controls.maxPolarAngle = Math.PI/3
     this.controls.minPolarAngle = Math.PI/6
     this.controls.maxDistance = 2000
@@ -65,44 +119,18 @@ export class ChessField {
     // add chess field
     new Board((_board: THREE.Mesh) => {
       this.scene.add(_board)
+      this.render()
     })
 
-    const raycaster = new THREE.Raycaster()
-    const pointer = new THREE.Vector2()
     const cells = new Cells(boardSizes, this.scene, () => { this.render() })
-    const engine = new ChessEngine(cells)
+    this.engine = new ChessEngine(this, cells)
 
-    const getPointerParams = (_event: MouseEvent) => {
-      const boundRect = _el.getBoundingClientRect()
-      const xParam = ((_event.clientX - boundRect.x) / _innerWidth) * 2 - 1
-      const yParam = - ((_event.clientY - boundRect.y) / _innerHeight) * 2 + 1
-      return { x: xParam, y: yParam }
-     }
-
-    _el.onmousemove = (_event: MouseEvent) => {
-      if (engine.interCells.length) {
-        const pointerParams = getPointerParams(_event)
-        pointer.set(pointerParams.x, pointerParams.y)
-        raycaster.setFromCamera(pointer, this.cam)
-        const intersects = raycaster.intersectObjects(engine.interCells, false)
-        cells.hideAllowedCells(engine)
-        if (intersects.length > 0) {
-          const object = <coordsMesh>intersects[0].object
-          engine.onSelectCell(<string>object.iCoord, <number>object.jCoord)
-        }
-      }
-    }
-
-    _el.onclick = () => {
-      engine.onClickEvent()
-    }
-
-    const pieceSets = engine.getConf().pieces
+    const pieceSets = this.engine.getConf().pieces
 
     Piece.createPieces(pieceSets, this.scene, cells, () => {
       this.render()
     }).then(() => {
-      engine.start()
+      this.isFieldReady = true
     })
   }
 }

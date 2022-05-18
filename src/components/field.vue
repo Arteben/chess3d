@@ -24,7 +24,7 @@ export default {
 
     const switchColor = function (_type) {
       if (_type) {
-        chessField.setBackground()
+        chessField.startNewGame(_type)
       }
     }
 
@@ -32,8 +32,6 @@ export default {
       chessField = new ChessField(fieldEl.value, 1200, 600)
       watchEffect(() => switchColor(props.p_game))
     })
-
-
 
     return { fieldEl }
   },

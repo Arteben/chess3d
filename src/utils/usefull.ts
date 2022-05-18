@@ -40,3 +40,13 @@ export const getMeshCoords = (_meshCoords: coordsMesh) => {
 export const getStringFromCoords = (_coords: cellCoards) => {
   return `${_coords.i}${_coords.j}`
 }
+
+export const getPointerParams = (_event: MouseEvent,
+                                  _el: HTMLElement,
+                                  _width: number,
+                                  _height: number) => {
+  const boundRect = _el.getBoundingClientRect()
+  const xParam = ((_event.clientX - boundRect.x) / _width) * 2 - 1
+  const yParam = - ((_event.clientY - boundRect.y) / _height) * 2 + 1
+  return { x: xParam, y: yParam }
+}

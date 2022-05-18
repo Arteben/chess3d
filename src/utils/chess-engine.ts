@@ -1,9 +1,12 @@
+import * as THREE from 'three'
 import * as jsChessEngine from 'js-chess-engine'
 import { Cells } from '@/utils/cells'
+import { ChessField } from '@/utils/chess-field'
 import {
   getCoordsStr as getCoords,
   getMeshCoords,
   getStringFromCoords,
+  getPointerParams,
 } from '@/utils/usefull'
 
 import {
@@ -47,19 +50,20 @@ interface moveIA {
 }
 //
 export class ChessEngine {
+
   game: jsChessEngine.Game
+  raycaster = new THREE.Raycaster()
+  pointer = new THREE.Vector2()
   cells: Cells
+  field: ChessField
+
   levelAI: 0
-
   gameState: gameStates
-
   mover: moverTypes
-
   playerType: moverTypes
   playerState: playerStates
 
   selectedCell: cellCoards | null
-
   cupturedCell: cellCoards | null
 
   get interCells() :coordsMesh[] {
@@ -83,6 +87,26 @@ export class ChessEngine {
   }
 
   // events
+  onMoveEvents (_event: MouseEvent) {
+    console.log('on move events!')
+    if (this.interCells.length) {
+
+      const pointer = this.pointer
+      const raycaster = this.raycaster
+      const field = this.field
+
+      const pointerParams = getPointerParams(_event, field.canvas, field.canvasW, field.canvasH)
+      pointer.set(pointerParams.x, pointerParams.y)
+      raycaster.setFromCamera(pointer, field.cam)
+      const intersects = raycaster.intersectObjects(this.interCells, false)
+      this.cells.hideAllowedCells(this)
+      if (intersects.length > 0) {
+        const object = <coordsMesh>intersects[0].object
+        this.onSelectCell(<string>object.iCoord, <number>object.jCoord)
+      }
+    }
+  }
+
   onClickEvent () {
     if (this.selectedCell) {
       switch (this.playerState) {
@@ -106,6 +130,7 @@ export class ChessEngine {
       this.playerState = playerStates.pieceSearch
     }
   }
+  //
 
   onSelectCell (_i: string, _j: number) {
     this.selectedCell = <cellCoards> {
@@ -174,12 +199,18 @@ export class ChessEngine {
     this.nextTurn()
   }
 
-  start() {
+  start(_typeStr: string) {
     this.gameState = gameStates.turns
-    this.playerState = playerStates.pieceSearch
+    const isWhite = moverTypes.white === moverTypes[_typeStr]
+    if (isWhite) {
+      this.playerState = playerStates.pieceSearch
+    } else {
+      this.playerType = moverTypes.black
+      this.turnAI()
+    }
   }
 
-  constructor (_cells: Cells) {
+  constructor (_chessField: ChessField, _cells: Cells) {
     this.game = new jsChessEngine.Game()
     this.gameState = gameStates.unStarted
     this.mover = moverTypes.white
@@ -188,5 +219,6 @@ export class ChessEngine {
     this.selectedCell = null
     this.cupturedCell = null
     this.cells = _cells
+    this.field = _chessField
   }
 }
