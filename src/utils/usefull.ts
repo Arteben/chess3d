@@ -36,3 +36,7 @@ export const getMeshCoords = (_meshCoords: coordsMesh) => {
       j: <number>_meshCoords.jCoord || 1,
     }
 }
+
+export const getStringFromCoords = (_coords: cellCoards) => {
+  return `${_coords.i}${_coords.j}`
+}

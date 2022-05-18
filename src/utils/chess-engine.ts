@@ -2,11 +2,23 @@ import * as jsChessEngine from 'js-chess-engine'
 import { Cells } from '@/utils/cells'
 import {
   getCoordsStr as getCoords,
-  cachingDecoratorSimple as cashFunc,
   getMeshCoords,
+  getStringFromCoords,
 } from '@/utils/usefull'
-import { cellCoards, pieces, coordsMesh } from '@/types/common'
 
+import {
+  cellCoards,
+  pieces,
+  coordsMesh,
+  gameStates,
+  moverTypes,
+  playerStates,
+} from '@/types/common'
+
+import {
+  getLighted,
+  getDisplayed,
+} from '@/utils/calc-displayed-cells'
 interface castling {
   blackLong: boolean
   blackShort: boolean
@@ -33,74 +45,6 @@ interface moves {
 interface moveIA {
   [index: string]: string
 }
-
-enum gameStates { unStarted, turns, finished }
-
-enum moverTypes { white, black }
-
-enum playerStates { pieceSearch, cuptureMove, none }
-
-// calc interactive cells for current game states
-const getAvailableMoveCoords = (_moves: string[]) => {
-  const coords: cellCoards[] = []
-  for (const move of _moves) {
-    coords.push(getCoords(move))
-  }
-  return coords
-}
-
-const getStringFromCoords = (_coords: cellCoards) => {
-  return `${_coords.i}${_coords.j}`
-}
-
-const getLighted = cashFunc(function(
-  _playerState: playerStates,
-  _that: ChessEngine
-) {
-  const displayed: coordsMesh[] = []
-
-  if (_that.playerState !== playerStates.cuptureMove) {
-    return displayed
-  }
-
-  if (_that.cupturedCell) {
-    const strMove = getStringFromCoords(_that.cupturedCell)
-    const coords = getAvailableMoveCoords(_that.game.moves()[strMove])
-    for (const coordObj of coords) {
-      displayed.push(_that.cells.field[coordObj.i][coordObj.j].frame)
-    }
-  }
-  return displayed
-})
-
-const getDisplayed = cashFunc(function(
-  _playerState: playerStates,
-  _that: ChessEngine
-) {
-  const displayed: coordsMesh[] = []
-
-  if (_playerState == playerStates.none) {
-    return displayed
-  }
-
-  const moves = _that.game.moves()
-  let strMoves: string[]
-  let coords: cellCoards[]
-
-  switch (_playerState) {
-    case playerStates.pieceSearch:
-      strMoves = Object.keys(moves)
-      coords = getAvailableMoveCoords(strMoves)
-      for (const coordObj of coords) {
-        displayed.push(_that.cells.field[coordObj.i][coordObj.j].frame)
-      }
-    break
-    case playerStates.cuptureMove:
-      displayed.push(..._that.lightedCells)
-    break
-  }
-  return displayed
-})
 //
 export class ChessEngine {
   game: jsChessEngine.Game
