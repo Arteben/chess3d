@@ -15,10 +15,10 @@
     "@babel/core": "^7.17.9",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
+    "@types/three": "^0.139.0",
     "@types/web": "^0.0.61",
     "@typescript-eslint/eslint-plugin": "^5.19.0",
     "@typescript-eslint/parser": "^5.19.0",
-    "@types/three": "^0.139.0",
     "babel-loader": "^8.2.4",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^10.2.4",
@@ -40,6 +40,7 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "js-chess-engine": "^1.0.2",
     "three": "^0.139.2",
     "vue": "^3.2.31"
   }

@@ -3,13 +3,18 @@ import * as THREE from 'three'
 import { Piece } from '@/utils/piece'
 export interface pos2d {
   x: number
-  y: number
+  z: number
 }
 
 export interface pos3d {
   x: number
   y: number
   z: number
+}
+
+export interface cellCoards {
+  i: string
+  j: number
 }
 
 export interface coordsMesh extends THREE.Mesh {
@@ -41,7 +46,11 @@ export interface BoardSizesType {
   cellCountLine: number
 }
 
-export interface cellCoards {
-  i: string
-  j: number
-}
+export type pieces = {[index: string]: string}
+
+export enum gameStates { unStarted, turns, finished }
+
+export enum moverTypes { white, black }
+
+export enum playerStates { pieceSearch, cuptureMove, none }
+
