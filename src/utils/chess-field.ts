@@ -41,7 +41,7 @@ export class ChessField {
     this.controls.update()
     this.controls.maxPolarAngle = Math.PI/3
     this.controls.minPolarAngle = Math.PI/6
-    this.controls.maxDistance = 1500
+    this.controls.maxDistance = 2000
     this.controls.minDistance = 1000
 
     this.controls.addEventListener('change', () => {
@@ -67,16 +67,22 @@ export class ChessField {
       this.scene.add(_board)
     })
 
-
     const raycaster = new THREE.Raycaster()
     const pointer = new THREE.Vector2()
     const cells = new Cells(boardSizes, this.scene, () => { this.render() })
     const engine = new ChessEngine(cells)
 
+    const getPointerParams = (_event: MouseEvent) => {
+      const boundRect = _el.getBoundingClientRect()
+      const xParam = ((_event.clientX - boundRect.x) / _innerWidth) * 2 - 1
+      const yParam = - ((_event.clientY - boundRect.y) / _innerHeight) * 2 + 1
+      return { x: xParam, y: yParam }
+     }
 
-    _el.onmousemove = (_event) => {
+    _el.onmousemove = (_event: MouseEvent) => {
       if (engine.interCells.length) {
-        pointer.set((_event.clientX / _innerWidth) * 2 - 1, - (_event.clientY / _innerHeight) * 2 + 1)
+        const pointerParams = getPointerParams(_event)
+        pointer.set(pointerParams.x, pointerParams.y)
         raycaster.setFromCamera(pointer, this.cam)
         const intersects = raycaster.intersectObjects(engine.interCells, false)
         cells.hideAllowedCells(engine)
