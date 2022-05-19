@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Piece } from '@/utils/piece'
 import { Board } from '@/utils/board'
 import { Cells } from '@/utils/cells'
-import { pos2d, BoardSizesType } from '@/types/common'
+import { pos2d, BoardSizesType, castlingType } from '@/types/common'
 import { ChessEngine } from '@/utils/chess-engine'
 
 export class ChessField {
@@ -116,6 +116,13 @@ export class ChessField {
     const beginField = <pos2d>{x: 0, z: 0}
     const endField =  <pos2d>{x: 500, z: 500}
     const mainLines = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' ]
+    const castling: castlingType = {
+      'E1G1': ['H1', 'F1'],
+      'E1C1': ['A1', 'D1'],
+      'E8G8': ['H8', 'F8'],
+      'E8C8': ['A8', 'D8'],
+    }
+
     const boardSizes: BoardSizesType = {
       prWidth: 1000,
       prBegin: 135,
@@ -133,7 +140,7 @@ export class ChessField {
     })
 
     this.cells = new Cells(boardSizes, this.scene, () => { this.render() })
-    this.engine = new ChessEngine(this, this.cells)
+    this.engine = new ChessEngine(this, this.cells, castling)
 
     const pieceSets = this.engine.getConf().pieces
 
