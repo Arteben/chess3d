@@ -5,7 +5,7 @@ import {
   pos3d,
   verticalRow,
   coordsMesh,
-  cellCoards,
+  cellCoords,
 } from '@/types/common'
 import { getMeshCoords } from '@/utils/usefull'
 import { ChessEngine } from '@/utils/chess-engine'
@@ -28,11 +28,11 @@ export class Cells {
 
   render: () => void
 
-  getCell(_coords: cellCoards) {
+  getCell(_coords: cellCoords) {
     return this.field[_coords.i][_coords.j]
   }
 
-  selectCell (_coords: cellCoards,
+  selectCell (_coords: cellCoords,
               _type: keyof cellColorsType,
               _isRender = true ) {
     const mesh = Cells.getMesh(_coords, this.field)
@@ -44,7 +44,7 @@ export class Cells {
     }
   }
 
-  hideCell (_coords: cellCoards, _isRender = true) {
+  hideCell (_coords: cellCoords, _isRender = true) {
     const mesh = Cells.getMesh(_coords, this.field)
     mesh.visible = false
 
@@ -84,7 +84,7 @@ export class Cells {
     }
   }
 
-  static getMesh(_coords: cellCoards, _field: fieldCellsType) {
+  static getMesh(_coords: cellCoords, _field: fieldCellsType) {
     return <THREE.Mesh>_field[_coords.i][_coords.j].sign
   }
 

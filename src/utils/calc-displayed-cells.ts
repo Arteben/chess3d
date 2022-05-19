@@ -5,7 +5,7 @@ import {
 } from '@/utils/usefull'
 
 import {
-  cellCoards,
+  cellCoords,
   coordsMesh,
   playerStates,
  } from '@/types/common'
@@ -14,7 +14,7 @@ import {
 
 // calc interactive cells for current game states
 const getAvailableMoveCoords = (_moves: string[]) => {
-  const coords: cellCoards[] = []
+  const coords: cellCoords[] = []
   for (const move of _moves) {
     coords.push(getCoords(move))
   }
@@ -53,7 +53,7 @@ export const getDisplayed = cashFunc(function(
 
   const moves = _that.game.moves()
   let strMoves: string[]
-  let coords: cellCoards[]
+  let coords: cellCoords[]
 
   switch (_playerState) {
     case playerStates.pieceSearch:

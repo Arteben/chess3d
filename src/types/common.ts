@@ -12,7 +12,7 @@ export interface pos3d {
   z: number
 }
 
-export interface cellCoards {
+export interface cellCoords {
   i: string
   j: number
 }

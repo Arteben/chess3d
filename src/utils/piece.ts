@@ -2,7 +2,7 @@
 import * as THREE from 'three'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as pieces from '@/utils/pieces-index'
-import { pos2d, pieces as piecesType, cellCoards } from '@/types/common'
+import { pos2d, pieces as piecesType, cellCoords } from '@/types/common'
 import { Cells } from '@/utils/cells'
 import { getCoordsStr, hasUpperCase } from '@/utils/usefull'
 interface pieceColors {
@@ -25,7 +25,7 @@ export class Piece {
   isWhite: boolean
   type: string
   startPosition: pos2d
-  startCoords: cellCoards
+  startCoords: cellCoords
 
   setPosition(_position: pos2d) {
     this.piece.position.setX(_position.x)
@@ -65,7 +65,7 @@ export class Piece {
 
   static reSetPieces (_pieces: Piece[], _cells: Cells) {
     _cells.removePieces()
-    let coords: cellCoards
+    let coords: cellCoords
     for (const piece of _pieces) {
       coords = piece.startCoords
       _cells.field[coords.i][coords.j].piece = piece
@@ -76,7 +76,7 @@ export class Piece {
   constructor (_resolve: (_p: Piece) => void,
               _gltfName: string,
               _startPosition: pos2d,
-              _startCoords: cellCoards,
+              _startCoords: cellCoords,
               _isWhite?: boolean,
             ) {
 

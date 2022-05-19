@@ -10,7 +10,7 @@ import {
 } from '@/utils/usefull'
 
 import {
-  cellCoards,
+  cellCoords,
   pieces,
   coordsMesh,
   gameStates,
@@ -63,8 +63,8 @@ export class ChessEngine {
   playerType: moverTypes
   playerState: playerStates
 
-  selectedCell: cellCoards | null
-  cupturedCell: cellCoards | null
+  selectedCell: cellCoords | null
+  cupturedCell: cellCoords | null
 
   get interCells() :coordsMesh[] {
     return getDisplayed(this.playerState, this)
@@ -132,7 +132,7 @@ export class ChessEngine {
   //
 
   onSelectCell (_i: string, _j: number) {
-    this.selectedCell = <cellCoards> {
+    this.selectedCell = <cellCoords> {
       i: <string>_i,
       j: <number>_j,
     }
@@ -154,7 +154,7 @@ export class ChessEngine {
     }
   }
 
-  goMove(_piece: cellCoards, _move: cellCoards, _isMove = true) {
+  goMove(_piece: cellCoords, _move: cellCoords, _isMove = true) {
     const {i: iPiece, j: jPiece} = _piece
     const {i: iMove, j: jMove} = _move
     const pieceCell = this.cells.field[iPiece][jPiece]
