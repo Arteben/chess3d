@@ -16,6 +16,7 @@ import {
   gameStates,
   moverTypes,
   playerStates,
+  castlingType,
 } from '@/types/common'
 
 import {
@@ -56,6 +57,7 @@ export class ChessEngine {
   pointer = new THREE.Vector2()
   cells: Cells
   field: ChessField
+  castling: castlingType
 
   levelAI: 0
   gameState: gameStates
@@ -119,7 +121,7 @@ export class ChessEngine {
           break
         case playerStates.cuptureMove: {
           if (this.cupturedCell) {
-            this.goMove(this.cupturedCell, this.selectedCell)
+            this.goMove(this.cupturedCell, this.selectedCell, true)
             this.nextTurn()
           }
         }
@@ -154,7 +156,7 @@ export class ChessEngine {
     }
   }
 
-  goMove(_piece: cellCoords, _move: cellCoords, _isMove = true) {
+  goMove(_piece: cellCoords, _move: cellCoords, _isMove: boolean, _isUsualMove = true) {
     const {i: iPiece, j: jPiece} = _piece
     const {i: iMove, j: jMove} = _move
     const pieceCell = this.cells.field[iPiece][jPiece]
@@ -163,9 +165,22 @@ export class ChessEngine {
     const moveCell = this.cells.field[iMove][jMove]
     const moveCoords = moveCell.center
     const enemyPiece = moveCell.piece
+    const strCrdMove = getStringFromCoords(_move)
+    const strCrdPiece = getStringFromCoords(_piece)
 
-    if (enemyPiece) {
-      enemyPiece.setPosition({x: 20, z: 20})
+    const isCastling = (_moveStr: string, _piceStr: string) => {
+      const fullStr = _piceStr + _moveStr
+      const allCastles = Object.keys(this.castling)
+      return allCastles.includes(fullStr)
+    }
+
+    if (_isUsualMove) {
+      if (enemyPiece) {
+        enemyPiece.setPosition({x: 20, z: 20})
+      } else if (isCastling(strCrdMove, strCrdPiece)) {
+        const castleMove = this.castling[strCrdPiece + strCrdMove]
+        this.goMove(getCoords(castleMove[0]), getCoords(castleMove[1]), false, false)
+      }
     }
 
     if (piece) {
@@ -228,9 +243,10 @@ export class ChessEngine {
     this.cupturedCell = null
   }
 
-  constructor (_chessField: ChessField, _cells: Cells) {
+  constructor (_chessField: ChessField, _cells: Cells, _castling: castlingType) {
     this.cells = _cells
     this.field = _chessField
+    this.castling = _castling
 
     this.setNewGamesParams()
   }
