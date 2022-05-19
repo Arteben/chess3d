@@ -24,6 +24,7 @@ const cellColors: cellColorsType = {
 export class Cells {
 
   field: fieldCellsType = {}
+  fieldMainLines: string[]
 
   render: () => void
 
@@ -74,19 +75,30 @@ export class Cells {
     this.render()
   }
 
+  removePieces () {
+    const line = this.fieldMainLines
+    for (const el of line) {
+      for (let i = 0; i < this.fieldMainLines.length; i++) {
+        this.field[el][i + 1].piece = undefined
+      }
+    }
+  }
+
   static getMesh(_coords: cellCoards, _field: fieldCellsType) {
     return <THREE.Mesh>_field[_coords.i][_coords.j].sign
   }
 
   constructor(_sizes: BoardSizesType, _scene: THREE.Scene, _render: ()=> void) {
+    this.render = _render
+    this.fieldMainLines = _sizes.mainLines
+
     const onePr = Math.abs(_sizes.endField.x - _sizes.beginField.x)/_sizes.prWidth
-    const cellWidth = ((_sizes.prEnd - _sizes.prBegin)/_sizes.cellCountLine) * onePr
+    const cellWidth = ((_sizes.prEnd - _sizes.prBegin)/this.fieldMainLines.length) * onePr
 
     const getCenterCell = (_idx) => {
       return (_sizes.prBegin * onePr) + (cellWidth * (_idx + 0.5))
     }
 
-    this.render = _render
 
     const signCellWidth = cellWidth - 5
     const signGeometry = new THREE.PlaneGeometry(signCellWidth, signCellWidth, 2, 2)
@@ -114,13 +126,13 @@ export class Cells {
       return frame
     }
 
-    _sizes.horsLine.forEach((_el, _idx) => {
+    this.fieldMainLines.forEach((_el, _idx) => {
       const rowCells: verticalRow = {}
-      for (let i = 0; i < _sizes.cellCountLine; i++) {
+      for (let i = 0; i < this.fieldMainLines.length; i++) {
         const cellCenter = <pos3d>{
           x: getCenterCell(_idx),
           y: _sizes.height,
-          z: getCenterCell(_sizes.cellCountLine - i - 1),
+          z: getCenterCell(this.fieldMainLines.length - i - 1),
         }
 
         const sign = getSignMesh(cellCenter)

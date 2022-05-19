@@ -42,8 +42,7 @@ export interface BoardSizesType {
   beginField: pos2d
   endField: pos2d
   height: number
-  horsLine: string[]
-  cellCountLine: number
+  mainLines: string[]
 }
 
 export type pieces = {[index: string]: string}

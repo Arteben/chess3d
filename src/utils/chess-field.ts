@@ -19,6 +19,10 @@ export class ChessField {
   canvasH: number
 
   isFieldReady = false
+  isHasStartedGame = false
+
+  pieces: Piece[]
+  cells: Cells
 
   setEngineEvents () {
     const engine = this.engine
@@ -33,10 +37,10 @@ export class ChessField {
   setPlayerCam (_type: string) {
     switch (_type) {
       case 'white':
-        this.cam.position.set(250, 650, 1500)
+        this.cam.position.set(250, 650, 1100)
         break
       case 'black':
-        this.cam.position.set(250, 650, -1500)
+        this.cam.position.set(250, 650, -1100)
     }
     this.controls.update()
   }
@@ -47,10 +51,17 @@ export class ChessField {
 
   startNewGame (_type: string) {
     if (this.isFieldReady) {
-      this.controls.autoRotate = false
-      this.setEngineEvents()
+      if (this.isHasStartedGame) {
+        Piece.reSetPieces(this.pieces, this.cells)
+        this.engine.start(_type, true)
+      } else {
+        this.isHasStartedGame = true
+        this.controls.autoRotate = false
+        this.setEngineEvents()
+        this.engine.start(_type)
+      }
+
       this.setPlayerCam(_type)
-      this.engine.start(_type)
     }
   }
 
@@ -104,7 +115,7 @@ export class ChessField {
 
     const beginField = <pos2d>{x: 0, z: 0}
     const endField =  <pos2d>{x: 500, z: 500}
-    const horsLine = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' ]
+    const mainLines = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' ]
     const boardSizes: BoardSizesType = {
       prWidth: 1000,
       prBegin: 135,
@@ -112,8 +123,7 @@ export class ChessField {
       beginField,
       endField,
       height: 0,
-      horsLine,
-      cellCountLine: 8,
+      mainLines,
     }
 
     // add chess field
@@ -122,14 +132,15 @@ export class ChessField {
       this.render()
     })
 
-    const cells = new Cells(boardSizes, this.scene, () => { this.render() })
-    this.engine = new ChessEngine(this, cells)
+    this.cells = new Cells(boardSizes, this.scene, () => { this.render() })
+    this.engine = new ChessEngine(this, this.cells)
 
     const pieceSets = this.engine.getConf().pieces
 
-    Piece.createPieces(pieceSets, this.scene, cells, () => {
+    Piece.createPieces(pieceSets, this.scene, this.cells, () => {
       this.render()
-    }).then(() => {
+    }).then((_pieces: Piece[]) => {
+      this.pieces = _pieces
       this.isFieldReady = true
     })
   }

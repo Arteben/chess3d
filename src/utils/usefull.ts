@@ -50,3 +50,7 @@ export const getPointerParams = (_event: MouseEvent,
   const yParam = - ((_event.clientY - boundRect.y) / _height) * 2 + 1
   return { x: xParam, y: yParam }
 }
+
+export const hasUpperCase = (_str: string) => {
+  return String(_str).toUpperCase() == _str
+}

@@ -88,7 +88,6 @@ export class ChessEngine {
 
   // events
   onMoveEvents (_event: MouseEvent) {
-    console.log('on move events!')
     if (this.interCells.length) {
 
       const pointer = this.pointer
@@ -199,7 +198,16 @@ export class ChessEngine {
     this.nextTurn()
   }
 
-  start(_typeStr: string) {
+  start(_typeStr: string, _initGame = false) {
+
+    if (_initGame) {
+      this.hideCupturedMove()
+      this.setNewGamesParams()
+      // recalc interCells & lighteCells
+      this.interCells.length
+      this.lightedCells.length
+    }
+
     this.gameState = gameStates.turns
     const isWhite = moverTypes.white === moverTypes[_typeStr]
     if (isWhite) {
@@ -210,7 +218,7 @@ export class ChessEngine {
     }
   }
 
-  constructor (_chessField: ChessField, _cells: Cells) {
+  setNewGamesParams () {
     this.game = new jsChessEngine.Game()
     this.gameState = gameStates.unStarted
     this.mover = moverTypes.white
@@ -218,7 +226,12 @@ export class ChessEngine {
     this.playerState = playerStates.none
     this.selectedCell = null
     this.cupturedCell = null
+  }
+
+  constructor (_chessField: ChessField, _cells: Cells) {
     this.cells = _cells
     this.field = _chessField
+
+    this.setNewGamesParams()
   }
 }
