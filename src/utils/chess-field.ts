@@ -40,7 +40,7 @@ export class ChessField {
         this.cam.position.set(250, 650, 1100)
         break
       case 'black':
-        this.cam.position.set(250, 650, -1100)
+        this.cam.position.set(250, 650, -850)
     }
     this.controls.update()
   }
