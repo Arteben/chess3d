@@ -27,7 +27,7 @@ export default {
   },
   setup() {
     let popupMenu = ref('')
-    let game = ref('')
+    let game = ref({})
 
     const onSelectMenu = (_title) => {
       popupMenu.value = _title
@@ -38,7 +38,7 @@ export default {
     }
 
     const onStartGame = (_type) => {
-      game.value = _type
+      game.value = { type: _type }
     }
 
     return {

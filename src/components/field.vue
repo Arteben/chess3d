@@ -13,8 +13,10 @@ export default {
   components: {},
   props: {
     p_game: {
-      type: String,
-      default: '',
+      type: Object,
+      default () {
+        return { type: ''}
+      },
     },
   },
   // eslint-disable-next-line no-unused-vars
@@ -22,9 +24,9 @@ export default {
     const fieldEl = ref(null)
     let chessField
 
-    const switchColor = function (_type) {
-      if (_type) {
-        chessField.setBackground()
+    const switchColor = function (_game) {
+      if (_game.type) {
+        chessField.startNewGame(_game.type)
       }
     }
 
@@ -32,8 +34,6 @@ export default {
       chessField = new ChessField(fieldEl.value, 1200, 600)
       watchEffect(() => switchColor(props.p_game))
     })
-
-
 
     return { fieldEl }
   },

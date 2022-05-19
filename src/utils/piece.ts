@@ -2,8 +2,9 @@
 import * as THREE from 'three'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as pieces from '@/utils/pieces-index'
-import { pos2d, pieces as piecesType } from '@/types/common'
+import { pos2d, pieces as piecesType, cellCoards } from '@/types/common'
 import { Cells } from '@/utils/cells'
+import { getCoordsStr, hasUpperCase } from '@/utils/usefull'
 interface pieceColors {
   color: THREE.ColorRepresentation
   emissive: THREE.ColorRepresentation
@@ -24,6 +25,7 @@ export class Piece {
   isWhite: boolean
   type: string
   startPosition: pos2d
+  startCoords: cellCoards
 
   setPosition(_position: pos2d) {
     this.piece.position.setX(_position.x)
@@ -35,46 +37,57 @@ export class Piece {
                       _cells: Cells,
                       _render: () => void) {
 
-    const hasUpperCase = (_str: string) => {
-      return String(_str).toUpperCase() == _str
-    }
-
     return new Promise((_resolve) => {
       let piecesCount = Object.keys(_pieceSet).length
+      const pieces: Piece[] = []
       const resolveCreate = (_piece: Piece) => {
         _piece.setPosition({x: _piece.startPosition.x, z: _piece.startPosition.z})
         _scene.add(_piece.piece)
+        pieces.push(_piece)
         piecesCount--
         if (piecesCount === 0) {
           _render()
-          _resolve('ok')
+          _resolve(pieces)
         }
       }
 
       for (const [strCoords, typePiece] of Object.entries(_pieceSet)) {
         const isWhite = hasUpperCase(typePiece)
         const type = shortPieceBlackNames[String(typePiece).toLowerCase()]
-        const cell = _cells.field[strCoords[0]][Number(strCoords[1])]
+        const coords = getCoordsStr(strCoords)
+        const cell = _cells.field[coords.i][coords.j]
         const startPosition = {x: cell.center.x, z: cell.center.z}
-        const piece = new Piece(resolveCreate, type, startPosition, isWhite)
+        const piece = new Piece(resolveCreate, type, startPosition, coords, isWhite)
         cell.piece = piece
       }
     })
   }
 
+  static reSetPieces (_pieces: Piece[], _cells: Cells) {
+    _cells.removePieces()
+    let coords: cellCoards
+    for (const piece of _pieces) {
+      coords = piece.startCoords
+      _cells.field[coords.i][coords.j].piece = piece
+      piece.setPosition(piece.startPosition)
+    }
+  }
+
   constructor (_resolve: (_p: Piece) => void,
               _gltfName: string,
               _startPosition: pos2d,
+              _startCoords: cellCoards,
               _isWhite?: boolean,
             ) {
 
     this.isWhite = Boolean(_isWhite)
     this.type = _gltfName
     this.startPosition = _startPosition
+    this.startCoords = _startCoords
 
-    let colors: pieceColors = { color: 0x669977, emissive: 0x000000 }
+    let colors: pieceColors = { color: 0x66AA77, emissive: 0x000000 }
     if (_isWhite) {
-      colors = { color: 0xaaaa88, emissive: 0x555555 }
+      colors = { color: 0x999977, emissive: 0x555555 }
     }
 
     const material = new THREE.MeshStandardMaterial({
