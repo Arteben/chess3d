@@ -1,5 +1,6 @@
 
-const menuOptions = ['game', 'settings'] as string[]
+// const menuOptions = ['game', 'settings'] as string[]
+const menuOptions = ['game'] as string[]
 type menuOptionsType = typeof menuOptions[number]
 
 const games = ['white', 'black'] as string[]
