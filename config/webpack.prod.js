@@ -7,6 +7,9 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 module.exports = merge(common, {
   mode: 'production',
   devtool: false,
+  // output: {
+  //   publicPath: '/projects/chess3d/',
+  // },
   // module: {
   //   rules: [
   //     {
