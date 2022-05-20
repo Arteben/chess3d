@@ -106,7 +106,7 @@ export class ChessField {
 
     this.controls.maxPolarAngle = Math.PI/3
     this.controls.minPolarAngle = Math.PI/6
-    this.controls.maxDistance = 2000
+    this.controls.maxDistance = 3000
     this.controls.minDistance = 1000
 
     this.controls.addEventListener('change', () => {

@@ -114,6 +114,7 @@ export class ChessEngine {
         case playerStates.pieceSearch:
           this.cupturedCell = {...this.selectedCell}
           this.playerState = playerStates.cuptureMove
+          this.selectedCell = null
           this.cells.selectCell(this.cupturedCell, 'captured')
           for (const meshCoord of this.lightedCells) {
             this.cells.selectCell(getMeshCoords(meshCoord), 'available')
@@ -129,6 +130,7 @@ export class ChessEngine {
     } else if (this.playerState == playerStates.cuptureMove) {
       this.hideCupturedMove()
       this.playerState = playerStates.pieceSearch
+      this.interCells.length
     }
   }
   //
@@ -161,12 +163,13 @@ export class ChessEngine {
     const {i: iMove, j: jMove} = _move
     const pieceCell = this.cells.field[iPiece][jPiece]
     const piece = pieceCell.piece
-    pieceCell.piece = undefined
     const moveCell = this.cells.field[iMove][jMove]
     const moveCoords = moveCell.center
     const enemyPiece = moveCell.piece
     const strCrdMove = getStringFromCoords(_move)
     const strCrdPiece = getStringFromCoords(_piece)
+
+    pieceCell.piece = undefined
 
     const isCastling = (_moveStr: string, _piceStr: string) => {
       const fullStr = _piceStr + _moveStr
@@ -176,7 +179,8 @@ export class ChessEngine {
 
     if (_isUsualMove) {
       if (enemyPiece) {
-        enemyPiece.setPosition({x: 20, z: 20})
+        const stockPosition = this.cells.addToStock(enemyPiece)
+        enemyPiece.setPosition({x: stockPosition.x, z: stockPosition.z})
       } else if (isCastling(strCrdMove, strCrdPiece)) {
         const castleMove = this.castling[strCrdPiece + strCrdMove]
         this.goMove(getCoords(castleMove[0]), getCoords(castleMove[1]), false, false)
@@ -221,6 +225,7 @@ export class ChessEngine {
       // recalc interCells & lighteCells
       this.interCells.length
       this.lightedCells.length
+      this.cells.stockNumber = 0
     }
 
     this.gameState = gameStates.turns

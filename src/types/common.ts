@@ -55,4 +55,3 @@ export enum playerStates { pieceSearch, cuptureMove, none }
 export interface castlingType {
   [index: string]: string[]
 }
-

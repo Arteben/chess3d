@@ -2,7 +2,11 @@
 import * as THREE from 'three'
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import * as pieces from '@/utils/pieces-index'
-import { pos2d, pieces as piecesType, cellCoords } from '@/types/common'
+import {
+  pos2d,
+  pieces as piecesType,
+  cellCoords,
+} from '@/types/common'
 import { Cells } from '@/utils/cells'
 import { getCoordsStr, hasUpperCase } from '@/utils/usefull'
 interface pieceColors {
@@ -25,11 +29,15 @@ export class Piece {
   isWhite: boolean
   type: string
   startPosition: pos2d
-  startCoords: cellCoords
+  startCoords?: cellCoords
 
   setPosition(_position: pos2d) {
     this.piece.position.setX(_position.x)
     this.piece.position.setZ(_position.z)
+  }
+
+  setStartCoords (_startCoords: cellCoords) {
+    this.startCoords = _startCoords
   }
 
   static createPieces(_pieceSet: piecesType,
@@ -57,7 +65,8 @@ export class Piece {
         const coords = getCoordsStr(strCoords)
         const cell = _cells.field[coords.i][coords.j]
         const startPosition = {x: cell.center.x, z: cell.center.z}
-        const piece = new Piece(resolveCreate, type, startPosition, coords, isWhite)
+        const piece = new Piece(resolveCreate, type, startPosition, isWhite)
+        piece.setStartCoords(coords)
         cell.piece = piece
       }
     })
@@ -67,23 +76,23 @@ export class Piece {
     _cells.removePieces()
     let coords: cellCoords
     for (const piece of _pieces) {
-      coords = piece.startCoords
-      _cells.field[coords.i][coords.j].piece = piece
-      piece.setPosition(piece.startPosition)
+      if (piece.startCoords) {
+        coords = piece.startCoords
+        _cells.field[coords.i][coords.j].piece = piece
+        piece.setPosition(piece.startPosition)
+      }
     }
   }
 
   constructor (_resolve: (_p: Piece) => void,
               _gltfName: string,
               _startPosition: pos2d,
-              _startCoords: cellCoords,
               _isWhite?: boolean,
             ) {
 
     this.isWhite = Boolean(_isWhite)
     this.type = _gltfName
     this.startPosition = _startPosition
-    this.startCoords = _startCoords
 
     let colors: pieceColors = { color: 0x66AA77, emissive: 0x000000 }
     if (_isWhite) {
