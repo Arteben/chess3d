@@ -17,12 +17,16 @@ import {
   moverTypes,
   playerStates,
   castlingType,
+  pos2d,
 } from '@/types/common'
 
 import {
   getLighted,
   getDisplayed,
 } from '@/utils/calc-displayed-cells'
+
+import { Piece } from './piece'
+
 interface castling {
   blackLong: boolean
   blackShort: boolean
@@ -67,6 +71,7 @@ export class ChessEngine {
 
   selectedCell: cellCoords | null
   cupturedCell: cellCoords | null
+  promotionCell: cellCoords | null
 
   get interCells() :coordsMesh[] {
     return getDisplayed(this.playerState, this)
@@ -91,7 +96,6 @@ export class ChessEngine {
   // events
   onMoveEvents (_event: MouseEvent) {
     if (this.interCells.length) {
-
       const pointer = this.pointer
       const raycaster = this.raycaster
       const field = this.field
@@ -122,15 +126,26 @@ export class ChessEngine {
           break
         case playerStates.cuptureMove: {
           if (this.cupturedCell) {
-            this.goMove(this.cupturedCell, this.selectedCell, true)
+            const isNexTurn = this.goMove(this.cupturedCell, this.selectedCell, true)
+            if (isNexTurn) {
+              this.nextTurn()
+            }
+          }
+          break
+        }
+        case playerStates.promotionSearch: {
+          if (this.selectedCell && this.promotionCell) {
+            this.playerDoPromotion(this.selectedCell, this.promotionCell)
+            this.promotionCell = null
+            this.selectedCell = null
+            this.hideCupturedMove()
             this.nextTurn()
           }
         }
       }
-    } else if (this.playerState == playerStates.cuptureMove) {
+    } else {
       this.hideCupturedMove()
       this.playerState = playerStates.pieceSearch
-      this.interCells.length
     }
   }
   //
@@ -158,6 +173,43 @@ export class ChessEngine {
     }
   }
 
+  promotionPawn (_pawnCell: cellCoords, piece: Piece, _move: cellCoords, _isPlayer: boolean) {
+    this.playerState = playerStates.promotionSearch
+    this.hideCupturedMove()
+    this.promotionCell = _move
+    this.cupturedCell = _move
+    this.selectedCell = null
+
+    if (_isPlayer) {
+      this.game.move(getStringFromCoords(_pawnCell), getStringFromCoords(_move))
+    }
+
+    const stockPosition = this.cells.addToStock(piece)
+    piece.setPosition({x: stockPosition.x, z: stockPosition.z})
+    this.cells.field[_pawnCell.i][_pawnCell.j].piece = undefined
+  }
+
+  playerDoPromotion(_piece: cellCoords, _move: cellCoords) {
+    const oldPiece = this.cells.field[_piece.i][_piece.j].piece
+
+    if (!oldPiece) {
+      return
+    }
+
+    const moveCell = this.cells.field[_move.i][_move.j]
+    const position = moveCell.center
+    const location = getStringFromCoords(_move)
+    this.game.setPiece(location, oldPiece.symType)
+
+    const render = (_piece: Piece) => {
+      this.field.scene.add(_piece.piece)
+      _piece.setPosition(_piece.startPosition)
+      this.field.render()
+    }
+    const posObj = <pos2d>{x: position.x, z: position.z}
+    moveCell.piece = new Piece(render, oldPiece.type, oldPiece.symType, posObj, oldPiece.isWhite)
+  }
+
   goMove(_piece: cellCoords, _move: cellCoords, _isMove: boolean, _isUsualMove = true) {
     const {i: iPiece, j: jPiece} = _piece
     const {i: iMove, j: jMove} = _move
@@ -177,6 +229,12 @@ export class ChessEngine {
       return allCastles.includes(fullStr)
     }
 
+    const isPromotionPawn = (_piece: Piece, _moveCoords: cellCoords) => {
+      const linesCount = this.cells.fieldMainLines.length
+      const isLastLine = _moveCoords.j == 1 || _moveCoords.j == linesCount
+      return _piece.type == 'pawn' && isLastLine
+    }
+
     if (_isUsualMove) {
       if (enemyPiece) {
         const stockPosition = this.cells.addToStock(enemyPiece)
@@ -184,6 +242,9 @@ export class ChessEngine {
       } else if (isCastling(strCrdMove, strCrdPiece)) {
         const castleMove = this.castling[strCrdPiece + strCrdMove]
         this.goMove(getCoords(castleMove[0]), getCoords(castleMove[1]), false, false)
+      } else if (piece && isPromotionPawn(piece, _move)) {
+        this.promotionPawn(_piece, piece, _move, _isMove)
+        return false
       }
     }
 
@@ -194,6 +255,8 @@ export class ChessEngine {
       }
       piece.setPosition({x: moveCoords.x, z: moveCoords.z})
     }
+
+    return true
   }
 
   nextTurn () {
@@ -240,12 +303,41 @@ export class ChessEngine {
 
   setNewGamesParams () {
     this.game = new jsChessEngine.Game()
+
+    this.game.removePiece('A1')
+    this.game.removePiece('B1')
+    this.game.removePiece('C1')
+    this.game.removePiece('F1')
+    this.game.removePiece('G1')
+    this.game.removePiece('H1')
+    this.game.removePiece('A2')
+    this.game.removePiece('B2')
+    this.game.removePiece('C2')
+    this.game.removePiece('D2')
+    this.game.removePiece('E2')
+    this.game.removePiece('G2')
+
+    this.game.removePiece('A8')
+    this.game.removePiece('B8')
+    this.game.removePiece('C8')
+    this.game.removePiece('F8')
+    this.game.removePiece('G8')
+    this.game.removePiece('H8')
+    this.game.removePiece('E7')
+    this.game.removePiece('G7')
+    this.game.removePiece('C7')
+    this.game.removePiece('D7')
+    this.game.removePiece('H7')
+    this.game.removePiece('G7')
+
+
     this.gameState = gameStates.unStarted
     this.mover = moverTypes.white
     this.playerType = moverTypes.white
     this.playerState = playerStates.none
     this.selectedCell = null
     this.cupturedCell = null
+    this.promotionCell = null
   }
 
   constructor (_chessField: ChessField, _cells: Cells, _castling: castlingType) {

@@ -28,7 +28,7 @@ export class Cells {
   field: fieldCellsType = {}
   fieldMainLines: string[]
 
-  stockElements: 'X'
+  stockElements = 'X'
   stockNumber = 0
 
   render: () => void
@@ -196,14 +196,14 @@ export class Cells {
 
     const stockCells: verticalRow = {}
     for (let i = 0; i < 4 * mainLinesCount; i++) {
-      const cellCenter = getStockCenter(i)
-      const sign = getSignMesh(cellCenter)
-      const frame = getFrameMesh(cellCenter)
+      const cellStockCenter = getStockCenter(i)
+      const sign = getSignMesh(cellStockCenter)
+      const frame = getFrameMesh(cellStockCenter)
       frame.iCoord = this.stockElements
       frame.jCoord = i
 
       stockCells[frame.jCoord] = {
-        center: cellCenter,
+        center: cellStockCenter,
         sign,
         frame,
       }

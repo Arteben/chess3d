@@ -8,6 +8,7 @@ import {
   cellCoords,
   coordsMesh,
   playerStates,
+  moverTypes,
  } from '@/types/common'
 
  import { ChessEngine } from '@/utils/chess-engine'
@@ -66,6 +67,32 @@ export const getDisplayed = cashFunc(function(
     case playerStates.cuptureMove:
       displayed.push(..._that.lightedCells)
     break
+    case playerStates.promotionSearch: {
+      const cells = _that.cells
+      const line = cells.fieldMainLines
+      const coutLineElements = cells.fieldMainLines.length
+      const isWhite = _that.mover === moverTypes.white
+
+      const addFigure = (_el: string, j: number) => {
+        const piece = cells.field[_el][j].piece
+        if (piece && piece.isWhite == isWhite) {
+          if (piece.type != 'pawn' && piece.type != 'king') {
+            displayed.push(cells.field[_el][j].frame)
+          }
+        }
+      }
+
+      for (const el of line) {
+        for (let i = 0; i < coutLineElements; i++) {
+          addFigure(el, i + 1)
+        }
+      }
+
+      for (let i = 0; i < coutLineElements * 4; i++) {
+        addFigure(cells.stockElements, i)
+      }
+      break
+    }
   }
   return displayed
 })

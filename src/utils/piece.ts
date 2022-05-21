@@ -28,6 +28,7 @@ export class Piece {
   piece: THREE.Mesh
   isWhite: boolean
   type: string
+  symType: string
   startPosition: pos2d
   startCoords?: cellCoords
 
@@ -65,7 +66,7 @@ export class Piece {
         const coords = getCoordsStr(strCoords)
         const cell = _cells.field[coords.i][coords.j]
         const startPosition = {x: cell.center.x, z: cell.center.z}
-        const piece = new Piece(resolveCreate, type, startPosition, isWhite)
+        const piece = new Piece(resolveCreate, type, typePiece, startPosition, isWhite)
         piece.setStartCoords(coords)
         cell.piece = piece
       }
@@ -84,14 +85,19 @@ export class Piece {
     }
   }
 
+  // deletePiece () {
+  // }
+
   constructor (_resolve: (_p: Piece) => void,
               _gltfName: string,
+              _symType: string,
               _startPosition: pos2d,
               _isWhite?: boolean,
             ) {
 
     this.isWhite = Boolean(_isWhite)
     this.type = _gltfName
+    this.symType = _symType
     this.startPosition = _startPosition
 
     let colors: pieceColors = { color: 0x66AA77, emissive: 0x000000 }

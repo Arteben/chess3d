@@ -51,7 +51,7 @@ export enum gameStates { unStarted, turns, finished }
 
 export enum moverTypes { white, black }
 
-export enum playerStates { pieceSearch, cuptureMove, none }
+export enum playerStates { pieceSearch, cuptureMove, none, promotionSearch }
 export interface castlingType {
   [index: string]: string[]
 }
