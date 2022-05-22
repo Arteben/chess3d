@@ -1,4 +1,9 @@
-import { cellCoords, coordsMesh } from '@/types/common'
+import {
+  cellCoords,
+  coordsMesh,
+  importPieceInfo,
+  shortPieceBlackNames,
+} from '@/types/common'
 
 export const getCoordsStr = (_str: string) => {
   return <cellCoords>{
@@ -51,6 +56,13 @@ export const getPointerParams = (_event: MouseEvent,
   return { x: xParam, y: yParam }
 }
 
-export const hasUpperCase = (_str: string) => {
-  return String(_str).toUpperCase() == _str
+export const importPiece = (_info: string) => {
+  const hasUpperCase = (_str: string) => {
+    return String(_str).toUpperCase() == _str
+  }
+
+  return <importPieceInfo>{
+    isWhite: hasUpperCase(_info),
+    type: shortPieceBlackNames[String(_info).toLowerCase()],
+  }
 }
