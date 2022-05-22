@@ -73,6 +73,7 @@ export class ChessEngine {
   selectedCell: cellCoords | null
   cupturedCell: cellCoords | null
   promotionCell: cellCoords | null
+  AIMoveCell: cellCoords | null
 
   get interCells() :coordsMesh[] {
     return getDisplayed(this.playerState, this)
@@ -171,6 +172,10 @@ export class ChessEngine {
     if (this.cupturedCell) {
       this.cells.hideCell(this.cupturedCell)
       this.cupturedCell = null
+    }
+    if (this.AIMoveCell) {
+      this.cells.hideCell(this.AIMoveCell)
+      this.AIMoveCell = null
     }
   }
 
@@ -280,9 +285,11 @@ export class ChessEngine {
     const moveForAI = <moveIA>this.game.aiMove(this.levelAI)
     const piece = getCoords(Object.keys(moveForAI)[0])
     const move = getCoords(Object.values(moveForAI)[0])
+    this.AIMoveCell = move
     if (this.goMove(piece, move, false)) {
       this.nextTurn()
     }
+    this.cells.selectCell(this.AIMoveCell, 'aimove')
   }
 
   promotionPawnAISetPiece (_promotionCoords: cellCoords) {
@@ -332,6 +339,7 @@ export class ChessEngine {
     this.selectedCell = null
     this.cupturedCell = null
     this.promotionCell = null
+    this.AIMoveCell = null
   }
 
   constructor (_chessField: ChessField, _cells: Cells, _castling: castlingType) {

@@ -16,12 +16,14 @@ type cellColorsType = {
   selected: THREE.Color
   available: THREE.Color
   captured: THREE.Color
+  aimove: THREE.Color
 }
 
 const cellColors: cellColorsType = {
   selected: new THREE.Color(0xffdd55),
   available: new THREE.Color(0xFFFFF),
   captured: new THREE.Color(0x66FF66),
+  aimove: new THREE.Color(0xFF6666),
 }
 export class Cells {
 
@@ -75,6 +77,10 @@ export class Cells {
 
     if(_game.cupturedCell) {
       this.selectCell(_game.cupturedCell, 'captured', false)
+    }
+
+    if(_game.AIMoveCell) {
+      this.selectCell(_game.AIMoveCell, 'aimove', false)
     }
 
     this.render()
