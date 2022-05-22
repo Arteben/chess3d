@@ -85,7 +85,13 @@ export class Cells {
     const coutLineElements = this.fieldMainLines.length
     for (const el of line) {
       for (let i = 0; i < coutLineElements; i++) {
-        this.field[el][i + 1].piece = undefined
+        const piece = this.field[el][i + 1].piece
+        if (piece) {
+          this.field[el][i + 1].piece = undefined
+          if (!piece.startCoords) {
+            piece.removePiece()
+          }
+        }
       }
     }
 
@@ -165,6 +171,7 @@ export class Cells {
           center: cellCenter,
           sign,
           frame,
+          piece: undefined,
         }
       }
       this.field[_el] = rowCells
@@ -206,6 +213,7 @@ export class Cells {
         center: cellStockCenter,
         sign,
         frame,
+        piece: undefined,
       }
     }
 

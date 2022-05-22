@@ -8,19 +8,10 @@ import {
   cellCoords,
 } from '@/types/common'
 import { Cells } from '@/utils/cells'
-import { getCoordsStr, hasUpperCase } from '@/utils/usefull'
+import { getCoordsStr, importPiece } from '@/utils/usefull'
 interface pieceColors {
   color: THREE.ColorRepresentation
   emissive: THREE.ColorRepresentation
-}
-
-enum shortPieceBlackNames {
-  'p' = 'pawn',
-  'n' = 'horse',
-  'b' = 'elephant',
-  'r' = 'rook',
-  'q' = 'queen',
-  'k' = 'king'
 }
 
 export class Piece {
@@ -30,7 +21,11 @@ export class Piece {
   type: string
   symType: string
   startPosition: pos2d
+  fieldScene: THREE.Scene
   startCoords?: cellCoords
+
+  geometry: THREE.BufferGeometry
+  texture: THREE.MeshStandardMaterial
 
   setPosition(_position: pos2d) {
     this.piece.position.setX(_position.x)
@@ -39,6 +34,12 @@ export class Piece {
 
   setStartCoords (_startCoords: cellCoords) {
     this.startCoords = _startCoords
+  }
+
+  removePiece () {
+    this.geometry.dispose()
+    this.texture.dispose()
+    this.fieldScene.remove(this.piece)
   }
 
   static createPieces(_pieceSet: piecesType,
@@ -50,8 +51,6 @@ export class Piece {
       let piecesCount = Object.keys(_pieceSet).length
       const pieces: Piece[] = []
       const resolveCreate = (_piece: Piece) => {
-        _piece.setPosition({x: _piece.startPosition.x, z: _piece.startPosition.z})
-        _scene.add(_piece.piece)
         pieces.push(_piece)
         piecesCount--
         if (piecesCount === 0) {
@@ -61,12 +60,13 @@ export class Piece {
       }
 
       for (const [strCoords, typePiece] of Object.entries(_pieceSet)) {
-        const isWhite = hasUpperCase(typePiece)
-        const type = shortPieceBlackNames[String(typePiece).toLowerCase()]
+        const pieceInfo = importPiece(typePiece)
+        const isWhite = pieceInfo.isWhite
+        const type = pieceInfo.type
         const coords = getCoordsStr(strCoords)
         const cell = _cells.field[coords.i][coords.j]
         const startPosition = {x: cell.center.x, z: cell.center.z}
-        const piece = new Piece(resolveCreate, type, typePiece, startPosition, isWhite)
+        const piece = new Piece(resolveCreate, type, typePiece, startPosition, _scene, isWhite)
         piece.setStartCoords(coords)
         cell.piece = piece
       }
@@ -85,13 +85,11 @@ export class Piece {
     }
   }
 
-  // deletePiece () {
-  // }
-
   constructor (_resolve: (_p: Piece) => void,
               _gltfName: string,
               _symType: string,
               _startPosition: pos2d,
+              _scene: THREE.Scene,
               _isWhite?: boolean,
             ) {
 
@@ -99,6 +97,7 @@ export class Piece {
     this.type = _gltfName
     this.symType = _symType
     this.startPosition = _startPosition
+    this.fieldScene = _scene
 
     let colors: pieceColors = { color: 0x66AA77, emissive: 0x000000 }
     if (_isWhite) {
@@ -133,6 +132,10 @@ export class Piece {
 
     getPieceGeometry().then((_pieceGeometry) => {
       this.piece = new THREE.Mesh(_pieceGeometry, material)
+      this.geometry = _pieceGeometry
+      this.texture = material
+      this.setPosition({x: this.startPosition.x, z: this.startPosition.z})
+      this.fieldScene.add(this.piece)
       _resolve(this)
     })
   }

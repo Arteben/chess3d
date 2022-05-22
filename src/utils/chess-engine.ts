@@ -7,6 +7,7 @@ import {
   getMeshCoords,
   getStringFromCoords,
   getPointerParams,
+  importPiece,
 } from '@/utils/usefull'
 
 import {
@@ -143,7 +144,7 @@ export class ChessEngine {
           }
         }
       }
-    } else {
+    } else if (this.playerState == playerStates.cuptureMove) {
       this.hideCupturedMove()
       this.playerState = playerStates.pieceSearch
     }
@@ -174,19 +175,26 @@ export class ChessEngine {
   }
 
   promotionPawn (_pawnCell: cellCoords, piece: Piece, _move: cellCoords, _isPlayer: boolean) {
-    this.playerState = playerStates.promotionSearch
-    this.hideCupturedMove()
-    this.promotionCell = _move
-    this.cupturedCell = _move
     this.selectedCell = null
 
     if (_isPlayer) {
+      this.hideCupturedMove()
+      this.playerState = playerStates.promotionSearch
+      this.promotionCell = _move
+      this.cupturedCell = _move
       this.game.move(getStringFromCoords(_pawnCell), getStringFromCoords(_move))
+    } else {
+      this.promotionPawnAISetPiece(_move)
     }
 
     const stockPosition = this.cells.addToStock(piece)
     piece.setPosition({x: stockPosition.x, z: stockPosition.z})
     this.cells.field[_pawnCell.i][_pawnCell.j].piece = undefined
+
+    if (!_isPlayer) {
+      console.log('next turn!')
+      this.nextTurn()
+    }
   }
 
   playerDoPromotion(_piece: cellCoords, _move: cellCoords) {
@@ -197,17 +205,13 @@ export class ChessEngine {
     }
 
     const moveCell = this.cells.field[_move.i][_move.j]
-    const position = moveCell.center
     const location = getStringFromCoords(_move)
     this.game.setPiece(location, oldPiece.symType)
 
-    const render = (_piece: Piece) => {
-      this.field.scene.add(_piece.piece)
-      _piece.setPosition(_piece.startPosition)
-      this.field.render()
-    }
-    const posObj = <pos2d>{x: position.x, z: position.z}
-    moveCell.piece = new Piece(render, oldPiece.type, oldPiece.symType, posObj, oldPiece.isWhite)
+    const posObj = <pos2d> {x: moveCell.center.x, z: moveCell.center.z}
+    const render = () => { this.field.render() }
+    moveCell.piece = new Piece(render,
+            oldPiece.type, oldPiece.symType, posObj, this.field.scene, oldPiece.isWhite)
   }
 
   goMove(_piece: cellCoords, _move: cellCoords, _isMove: boolean, _isUsualMove = true) {
@@ -276,8 +280,24 @@ export class ChessEngine {
     const moveForAI = <moveIA>this.game.aiMove(this.levelAI)
     const piece = getCoords(Object.keys(moveForAI)[0])
     const move = getCoords(Object.values(moveForAI)[0])
-    this.goMove(piece, move, false)
-    this.nextTurn()
+    if (this.goMove(piece, move, false)) {
+      this.nextTurn()
+    }
+  }
+
+  promotionPawnAISetPiece (_promotionCoords: cellCoords) {
+    const strCell = getStringFromCoords(_promotionCoords)
+    const pieces = this.getConf().pieces
+
+    const render = () => { this.field.render() }
+    const pieceInfo = importPiece(pieces[strCell])
+    const promotionCell = this.cells.field[_promotionCoords.i][_promotionCoords.j]
+    const posObj = <pos2d>{
+      x: promotionCell.center.x,
+      z: promotionCell.center.z,
+    }
+    promotionCell.piece = new Piece(render,
+      pieceInfo.type, pieces[strCell], posObj, this.field.scene, pieceInfo.isWhite)
   }
 
   start(_typeStr: string, _initGame = false) {
@@ -303,32 +323,6 @@ export class ChessEngine {
 
   setNewGamesParams () {
     this.game = new jsChessEngine.Game()
-
-    this.game.removePiece('A1')
-    this.game.removePiece('B1')
-    this.game.removePiece('C1')
-    this.game.removePiece('F1')
-    this.game.removePiece('G1')
-    this.game.removePiece('H1')
-    this.game.removePiece('A2')
-    this.game.removePiece('B2')
-    this.game.removePiece('C2')
-    this.game.removePiece('D2')
-    this.game.removePiece('E2')
-    this.game.removePiece('G2')
-
-    this.game.removePiece('A8')
-    this.game.removePiece('B8')
-    this.game.removePiece('C8')
-    this.game.removePiece('F8')
-    this.game.removePiece('G8')
-    this.game.removePiece('H8')
-    this.game.removePiece('E7')
-    this.game.removePiece('G7')
-    this.game.removePiece('C7')
-    this.game.removePiece('D7')
-    this.game.removePiece('H7')
-    this.game.removePiece('G7')
 
 
     this.gameState = gameStates.unStarted

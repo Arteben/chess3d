@@ -55,3 +55,17 @@ export enum playerStates { pieceSearch, cuptureMove, none, promotionSearch }
 export interface castlingType {
   [index: string]: string[]
 }
+
+export interface importPieceInfo {
+  isWhite: boolean
+  type: string
+}
+
+export enum shortPieceBlackNames {
+  'p' = 'pawn',
+  'n' = 'horse',
+  'b' = 'elephant',
+  'r' = 'rook',
+  'q' = 'queen',
+  'k' = 'king'
+}
