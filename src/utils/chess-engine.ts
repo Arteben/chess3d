@@ -182,7 +182,7 @@ export class ChessEngine {
     }
   }
 
-  promotionPawn (_pawnCell: cellCoords, piece: Piece, _move: cellCoords, _isPlayer: boolean) {
+  promotionPawn (_pawnCell: cellCoords, _move: cellCoords, _isPlayer: boolean) {
     this.selectedCell = null
 
     if (_isPlayer) {
@@ -195,10 +195,14 @@ export class ChessEngine {
       this.promotionPawnAISetPiece(_move)
     }
 
-    const stockPosition = this.cells.addToStock(piece)
-    piece.setPosition({x: stockPosition.x, z: stockPosition.z})
-    this.field.render()
-    this.cells.field[_pawnCell.i][_pawnCell.j].piece = undefined
+    const pawnCell = this.cells.field[_pawnCell.i][_pawnCell.j]
+    const piece = pawnCell.piece
+      if (piece) {
+        const stockPosition = this.cells.addToStock(piece)
+        piece.setPosition({x: stockPosition.x, z: stockPosition.z})
+        this.field.render()
+        pawnCell.piece = undefined
+      }
 
     if (!_isPlayer) {
       this.nextTurn()
@@ -234,8 +238,6 @@ export class ChessEngine {
       const strCrdMove = getStringFromCoords(_move)
       const strCrdPiece = getStringFromCoords(_piece)
 
-      pieceCell.piece = undefined
-
       const isCastling = (_moveStr: string, _piceStr: string) => {
         const fullStr = _piceStr + _moveStr
         const allCastles = Object.keys(this.castling)
@@ -257,10 +259,13 @@ export class ChessEngine {
           this.goMove(getCoords(castleMove[0]), getCoords(castleMove[1]), false, false)
           _resolve(true)
         } else if (piece && isPromotionPawn(piece, _move)) {
-          this.promotionPawn(_piece, piece, _move, _isDoGameMove)
+          this.promotionPawn(_piece, _move, _isDoGameMove)
           _resolve(false)
+          return
         }
       }
+
+      pieceCell.piece = undefined
 
       if (piece) {
         moveCell.piece = piece
