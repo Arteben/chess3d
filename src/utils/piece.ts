@@ -99,7 +99,7 @@ export class Piece {
     this.startPosition = _startPosition
     this.fieldScene = _scene
 
-    let colors: pieceColors = { color: 0x66AA77, emissive: 0x000000 }
+    let colors: pieceColors = { color: 0x668899, emissive: 0x000000 }
     if (_isWhite) {
       colors = { color: 0x999977, emissive: 0x555555 }
     }
