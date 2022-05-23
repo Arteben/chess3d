@@ -128,10 +128,16 @@ export class ChessEngine {
           break
         case playerStates.cuptureMove: {
           if (this.cupturedCell) {
-            const isNexTurn = this.goMove(this.cupturedCell, this.selectedCell, true)
-            if (isNexTurn) {
-              this.nextTurn()
-            }
+            this.playerState = playerStates.none
+            this.interCells.length
+            this.goMove(this.cupturedCell, this.selectedCell, true).then((_isNexTurn = true) => {
+              this.playerState = playerStates.cuptureMove
+              if (_isNexTurn) {
+                this.nextTurn()
+              } else {
+                this.interCells.length
+              }
+            })
           }
           break
         }
@@ -197,7 +203,6 @@ export class ChessEngine {
     this.cells.field[_pawnCell.i][_pawnCell.j].piece = undefined
 
     if (!_isPlayer) {
-      console.log('next turn!')
       this.nextTurn()
     }
   }
@@ -219,53 +224,91 @@ export class ChessEngine {
             oldPiece.type, oldPiece.symType, posObj, this.field.scene, oldPiece.isWhite)
   }
 
-  goMove(_piece: cellCoords, _move: cellCoords, _isMove: boolean, _isUsualMove = true) {
-    const {i: iPiece, j: jPiece} = _piece
-    const {i: iMove, j: jMove} = _move
-    const pieceCell = this.cells.field[iPiece][jPiece]
-    const piece = pieceCell.piece
-    const moveCell = this.cells.field[iMove][jMove]
-    const moveCoords = moveCell.center
-    const enemyPiece = moveCell.piece
-    const strCrdMove = getStringFromCoords(_move)
-    const strCrdPiece = getStringFromCoords(_piece)
+  goMove(_piece: cellCoords, _move: cellCoords, _isDoGameMove: boolean, _isUsualMove = true): Promise<boolean>{
+    return new Promise((_resolve) => {
+      const {i: iPiece, j: jPiece} = _piece
+      const {i: iMove, j: jMove} = _move
+      const pieceCell = this.cells.field[iPiece][jPiece]
+      const piece = pieceCell.piece
+      const moveCell = this.cells.field[iMove][jMove]
+      const moveCoords = moveCell.center
+      const enemyPiece = moveCell.piece
+      const strCrdMove = getStringFromCoords(_move)
+      const strCrdPiece = getStringFromCoords(_piece)
 
-    pieceCell.piece = undefined
+      pieceCell.piece = undefined
 
-    const isCastling = (_moveStr: string, _piceStr: string) => {
-      const fullStr = _piceStr + _moveStr
-      const allCastles = Object.keys(this.castling)
-      return allCastles.includes(fullStr)
-    }
-
-    const isPromotionPawn = (_piece: Piece, _moveCoords: cellCoords) => {
-      const linesCount = this.cells.fieldMainLines.length
-      const isLastLine = _moveCoords.j == 1 || _moveCoords.j == linesCount
-      return _piece.type == 'pawn' && isLastLine
-    }
-
-    if (_isUsualMove) {
-      if (enemyPiece) {
-        const stockPosition = this.cells.addToStock(enemyPiece)
-        enemyPiece.setPosition({x: stockPosition.x, z: stockPosition.z})
-      } else if (isCastling(strCrdMove, strCrdPiece)) {
-        const castleMove = this.castling[strCrdPiece + strCrdMove]
-        this.goMove(getCoords(castleMove[0]), getCoords(castleMove[1]), false, false)
-      } else if (piece && isPromotionPawn(piece, _move)) {
-        this.promotionPawn(_piece, piece, _move, _isMove)
-        return false
+      const isCastling = (_moveStr: string, _piceStr: string) => {
+        const fullStr = _piceStr + _moveStr
+        const allCastles = Object.keys(this.castling)
+        return allCastles.includes(fullStr)
       }
-    }
 
-    if (piece) {
-      moveCell.piece = piece
-      if (_isMove) {
-        this.game.move(getStringFromCoords(_piece), getStringFromCoords(_move))
+      const isPromotionPawn = (_piece: Piece, _moveCoords: cellCoords) => {
+        const linesCount = this.cells.fieldMainLines.length
+        const isLastLine = _moveCoords.j == 1 || _moveCoords.j == linesCount
+        return _piece.type == 'pawn' && isLastLine
       }
-      piece.setPosition({x: moveCoords.x, z: moveCoords.z})
-    }
 
-    return true
+      if (_isUsualMove) {
+        if (enemyPiece) {
+          const stockPosition = this.cells.addToStock(enemyPiece)
+          enemyPiece.setPosition({x: stockPosition.x, z: stockPosition.z})
+        } else if (isCastling(strCrdMove, strCrdPiece)) {
+          const castleMove = this.castling[strCrdPiece + strCrdMove]
+          this.goMove(getCoords(castleMove[0]), getCoords(castleMove[1]), false, false)
+          _resolve(true)
+        } else if (piece && isPromotionPawn(piece, _move)) {
+          this.promotionPawn(_piece, piece, _move, _isDoGameMove)
+          _resolve(false)
+        }
+      }
+
+      if (piece) {
+        moveCell.piece = piece
+        if (_isDoGameMove) {
+          this.game.move(getStringFromCoords(_piece), getStringFromCoords(_move))
+        }
+
+        if (_isUsualMove) {
+          this.animationSimpleMove(pieceCell.center, moveCoords, piece).then(() => {
+            _resolve(true)
+          })
+        } else {
+          piece.setPosition({x: moveCoords.x, z: moveCoords.z})
+        }
+      }
+    })
+  }
+
+  animationSimpleMove (_from: pos2d, _to: pos2d, _piece: Piece) {
+    return new Promise((_resolve) => {
+      let counter = 1
+      const maxLimit = 15
+      const newPos: pos2d = {x: 0, z: 0}
+
+      const oneXPercent = (_to.x - _from.x) / maxLimit
+      const oneZPercent = (_to.z - _from.z) / maxLimit
+
+      const getSize = (_counter, _from, _onePercent) => {
+        return _from + _onePercent * _counter
+      }
+
+      const animate = () => {
+        if (counter >= maxLimit) {
+          _piece.setPosition({x: _to.x, z: _to.z})
+          _resolve('ok')
+        } else {
+          newPos.x = getSize(counter, _from.x, oneXPercent)
+          newPos.z = getSize(counter, _from.z, oneZPercent)
+          _piece.setPosition({x: newPos.x, z: newPos.z})
+          this.field.render()
+          window.requestAnimationFrame(animate)
+          counter++
+        }
+      }
+      animate()
+    })
   }
 
   nextTurn () {
@@ -285,11 +328,13 @@ export class ChessEngine {
     const moveForAI = <moveIA>this.game.aiMove(this.levelAI)
     const piece = getCoords(Object.keys(moveForAI)[0])
     const move = getCoords(Object.values(moveForAI)[0])
-    this.AIMoveCell = move
-    if (this.goMove(piece, move, false)) {
-      this.nextTurn()
-    }
-    this.cells.selectCell(this.AIMoveCell, 'aimove')
+    this.goMove(piece, move, false).then((_isNext: boolean) => {
+      if (_isNext) {
+        this.AIMoveCell = move
+        this.cells.selectCell(this.AIMoveCell, 'aimove')
+        this.nextTurn()
+      }
+    })
   }
 
   promotionPawnAISetPiece (_promotionCoords: cellCoords) {
@@ -330,7 +375,6 @@ export class ChessEngine {
 
   setNewGamesParams () {
     this.game = new jsChessEngine.Game()
-
 
     this.gameState = gameStates.unStarted
     this.mover = moverTypes.white
