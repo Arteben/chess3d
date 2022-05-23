@@ -131,11 +131,9 @@ export class ChessEngine {
             this.playerState = playerStates.none
             this.interCells.length
             this.goMove(this.cupturedCell, this.selectedCell, true).then((_isNexTurn = true) => {
-              this.playerState = playerStates.cuptureMove
               if (_isNexTurn) {
+                this.playerState = playerStates.cuptureMove
                 this.nextTurn()
-              } else {
-                this.interCells.length
               }
             })
           }
@@ -146,7 +144,6 @@ export class ChessEngine {
             this.playerDoPromotion(this.selectedCell, this.promotionCell)
             this.promotionCell = null
             this.selectedCell = null
-            this.hideCupturedMove()
             this.nextTurn()
           }
         }
@@ -200,6 +197,7 @@ export class ChessEngine {
 
     const stockPosition = this.cells.addToStock(piece)
     piece.setPosition({x: stockPosition.x, z: stockPosition.z})
+    this.field.render()
     this.cells.field[_pawnCell.i][_pawnCell.j].piece = undefined
 
     if (!_isPlayer) {
@@ -329,9 +327,9 @@ export class ChessEngine {
     const piece = getCoords(Object.keys(moveForAI)[0])
     const move = getCoords(Object.values(moveForAI)[0])
     this.goMove(piece, move, false).then((_isNext: boolean) => {
+      this.AIMoveCell = move
+      this.cells.selectCell(this.AIMoveCell, 'aimove')
       if (_isNext) {
-        this.AIMoveCell = move
-        this.cells.selectCell(this.AIMoveCell, 'aimove')
         this.nextTurn()
       }
     })
