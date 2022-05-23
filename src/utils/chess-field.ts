@@ -37,7 +37,7 @@ export class ChessField {
   setPlayerCam (_type: string) {
     switch (_type) {
       case 'white':
-        this.cam.position.set(250, 650, 1100)
+        this.cam.position.set(250, 650, 1400)
         break
       case 'black':
         this.cam.position.set(250, 650, -850)

@@ -22,10 +22,11 @@ export default {
 
 <style scoped lang="sass">
 .button {
-  width: 120px;
-  font-size: 30px;
-  font-family: impact;
-  border-radius: 10px;
-  margin: 0 5px;
+  font-size: 15px;
+  font-family: arial;
+  font-weight: bold;
+  border-radius: 12px;
+  padding: 5px 8px;
+  display: inline;
 }
 </style>
