@@ -6,17 +6,14 @@
           @click-menu-btn="onStartGame"
         />
         <div class="stateContainer">
-          <span class="stateText"> play game!asdf asdf asdf asdfasfasdfasdf </span>
+          <span class="stateText">{{ stateGame }}</span>
         </div>
       </div>
-      <field :p_game="game" />
+      <field
+        :p_game="game"
+        @change-game-state="onChangeState"
+      />
     </div>
-    <!-- <popup-menu
-      v-if="popupMenu"
-      :p_menu="popupMenu"
-      @close-popup="onClosePopup()"
-      @start-game="onStartGame"
-    /> -->
   </div>
 </template>
 
@@ -24,7 +21,6 @@
 import { ref } from 'vue'
 import MainMenu from '@/components/main-menu.vue'
 import Field from '@/components/field.vue'
-// import PopupMenu from '@/components/popup-menu.vue'
 export default {
   name: 'RootElement',
   components: {
@@ -33,27 +29,25 @@ export default {
     // PopupMenu,
   },
   setup() {
-    let popupMenu = ref('')
     let game = ref({})
+    const stateGame = ref('')
 
-    const onSelectMenu = (_title) => {
-      popupMenu.value = _title
+    const onStartGame = (_infoGame) => {
+      game.value = {
+        type: _infoGame.type,
+        isGrandmaster: _infoGame.isTop,
+      }
     }
 
-    const onClosePopup = () => {
-      popupMenu.value = ''
-    }
-
-    const onStartGame = (_type) => {
-      game.value = { type: _type }
+    const onChangeState = (_state = '') => {
+      stateGame.value = _state
     }
 
     return {
-      onSelectMenu,
-      popupMenu,
-      onClosePopup,
       onStartGame,
       game,
+      onChangeState,
+      stateGame,
     }
   },
 }
