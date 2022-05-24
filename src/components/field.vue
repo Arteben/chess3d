@@ -38,7 +38,7 @@ export default {
     onMounted(() => {
       chessField = new ChessField(fieldEl.value, 1000, 600)
       chessField.setGameState = changeGameState
-      chessField.setGameState('PLAYER, select some color!')
+      chessField.setGameState('Player, please select a color')
       watchEffect(() => switchColor(props.p_game))
     })
 
