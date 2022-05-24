@@ -95,6 +95,38 @@ export class ChessEngine {
     }
   }
 
+  // this.field.setGameState(this.state)
+  get state() :string {
+    let stateStr = ''
+
+    const getPlayerStates = () => {
+      switch (this.playerState) {
+        case playerStates.pieceSearch:
+          return 'select some piece on the field.'
+        case playerStates.cuptureMove:
+          return 'select some move in colored cells.'
+        case playerStates.promotionSearch:
+          return 'select some your color figure for put on the field.'
+      }
+    }
+
+    if (this.isPlayerTurn) {
+      if (this.getConf().checkMate) {
+        stateStr = 'CHECKMATE, player you are lost'
+      } else if (this.getConf().check) {
+        stateStr = 'Player you CHECK,' + getPlayerStates()
+      } else {
+        stateStr = 'Player, ' + getPlayerStates()
+      }
+    } else if (this.getConf().checkMate) {
+      stateStr = 'Player you do CHECKMATE, you are WIN!'
+    } else {
+      stateStr = 'Please, wait for AI do a move'
+    }
+
+    return stateStr
+  }
+
   // events
   onMoveEvents (_event: MouseEvent) {
     if (this.interCells.length) {
@@ -120,6 +152,7 @@ export class ChessEngine {
         case playerStates.pieceSearch:
           this.cupturedCell = {...this.selectedCell}
           this.playerState = playerStates.cuptureMove
+          this.field.setGameState(this.state)
           this.selectedCell = null
           this.cells.selectCell(this.cupturedCell, 'captured')
           for (const meshCoord of this.lightedCells) {
@@ -151,6 +184,7 @@ export class ChessEngine {
     } else if (this.playerState == playerStates.cuptureMove) {
       this.hideCupturedMove()
       this.playerState = playerStates.pieceSearch
+      this.field.setGameState(this.state)
     }
   }
   //
@@ -188,6 +222,7 @@ export class ChessEngine {
     if (_isPlayer) {
       this.hideCupturedMove()
       this.playerState = playerStates.promotionSearch
+      this.field.setGameState(this.state)
       this.promotionCell = _move
       this.cupturedCell = _move
       this.game.move(getStringFromCoords(_pawnCell), getStringFromCoords(_move))
@@ -315,6 +350,12 @@ export class ChessEngine {
   }
 
   nextTurn () {
+
+    if (this.getConf().checkMate) {
+      this.field.setGameState(this.state)
+      return
+    }
+
     if (this.isPlayerTurn) {
       this.cells.hideAllowedCells(this)
       this.hideCupturedMove()
@@ -325,10 +366,12 @@ export class ChessEngine {
       this.mover = this.nextMover
       this.playerState = playerStates.pieceSearch
     }
+    this.field.setGameState(this.state)
   }
 
   turnAI () {
     const moveForAI = <moveIA>this.game.aiMove(this.levelAI)
+    this.field.setGameState(this.state)
     const piece = getCoords(Object.keys(moveForAI)[0])
     const move = getCoords(Object.values(moveForAI)[0])
     this.goMove(piece, move, false).then((_isNext: boolean) => {
@@ -374,6 +417,7 @@ export class ChessEngine {
       this.playerType = moverTypes.black
       this.turnAI()
     }
+    this.field.setGameState(this.state)
   }
 
   setNewGamesParams () {
