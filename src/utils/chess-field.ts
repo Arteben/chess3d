@@ -65,6 +65,10 @@ export class ChessField {
     }
   }
 
+  setGameState (_state: string) {
+    console.log(_state)
+  }
+
   constructor (_el: HTMLElement = document.body, _innerWidth = 300, _innerHeight = 300) {
     this.canvas = _el
     this.canvasW = _innerWidth

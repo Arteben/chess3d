@@ -19,19 +19,26 @@ export default {
       },
     },
   },
+  emits: ['change-game-state'],
   // eslint-disable-next-line no-unused-vars
-  setup(props) {
+  setup(props, { emit }) {
     const fieldEl = ref(null)
     let chessField
 
-    const switchColor = function (_game) {
+    const switchColor = (_game) => {
       if (_game.type) {
         chessField.startNewGame(_game.type)
       }
     }
 
+    const changeGameState = (_state) => {
+      emit('change-game-state', _state)
+    }
+
     onMounted(() => {
       chessField = new ChessField(fieldEl.value, 1000, 600)
+      chessField.setGameState = changeGameState
+      chessField.setGameState('Select some color PLAYER!')
       watchEffect(() => switchColor(props.p_game))
     })
 

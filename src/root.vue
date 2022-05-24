@@ -6,10 +6,13 @@
           @click-menu-btn="onStartGame"
         />
         <div class="stateContainer">
-          <span class="stateText"> play game!asdf asdf asdf asdfasfasdfasdf </span>
+          <span class="stateText">{{ stateGame }}</span>
         </div>
       </div>
-      <field :p_game="game" />
+      <field
+        :p_game="game"
+        @change-game-state="onChangeState"
+      />
     </div>
   </div>
 </template>
@@ -27,6 +30,7 @@ export default {
   },
   setup() {
     let game = ref({})
+    const stateGame = ref('')
 
     const onStartGame = (_infoGame) => {
       game.value = {
@@ -35,9 +39,15 @@ export default {
       }
     }
 
+    const onChangeState = (_state = '') => {
+      stateGame.value = _state
+    }
+
     return {
       onStartGame,
       game,
+      onChangeState,
+      stateGame,
     }
   },
 }
