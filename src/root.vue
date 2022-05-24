@@ -81,10 +81,10 @@ BODY {
   display: flex;
   background: white;
   flex-direction: row;
-  height: 35px;
+  height: 25px;
   flex-grow: 1;
   background: antiquewhite;
-  font-size: 30px;
+  font-size: 20px;
   padding: 10px;
   justify-content: center;
   border-radius: 10px 100px 0 0;
@@ -95,7 +95,7 @@ BODY {
 }
 
 .stateText {
-  width: 600px;
+  max-width: 800px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
