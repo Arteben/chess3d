@@ -35,7 +35,7 @@ export default {
     const onStartGame = (_infoGame) => {
       game.value = {
         type: _infoGame.type,
-        isGrandmaster: _infoGame.isTop,
+        isTop: _infoGame.isTop,
       }
     }
 

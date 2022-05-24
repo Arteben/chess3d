@@ -7,6 +7,11 @@ import { Cells } from '@/utils/cells'
 import { pos2d, BoardSizesType, castlingType } from '@/types/common'
 import { ChessEngine } from '@/utils/chess-engine'
 
+interface gameStartSettings {
+  type: string
+  isTop: boolean
+}
+
 export class ChessField {
   scene: THREE.Scene
   renderer: THREE.WebGLRenderer
@@ -49,19 +54,19 @@ export class ChessField {
     this.renderer.render(this.scene, this.cam)
   }
 
-  startNewGame (_type: string) {
+  startNewGame (_settings: gameStartSettings) {
     if (this.isFieldReady) {
       if (this.isHasStartedGame) {
         Piece.reSetPieces(this.pieces, this.cells)
-        this.engine.start(_type, true)
+        this.engine.start(_settings.type, _settings.isTop, true)
       } else {
         this.isHasStartedGame = true
         this.controls.autoRotate = false
         this.setEngineEvents()
-        this.engine.start(_type)
+        this.engine.start(_settings.type, _settings.isTop)
       }
 
-      this.setPlayerCam(_type)
+      this.setPlayerCam(_settings.type)
     }
   }
 

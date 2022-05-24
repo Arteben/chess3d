@@ -14,7 +14,6 @@ import {
   cellCoords,
   pieces,
   coordsMesh,
-  gameStates,
   moverTypes,
   playerStates,
   castlingType,
@@ -47,10 +46,6 @@ interface gameConf {
   turn: 'white' | 'black'
 }
 
-type listMoves = string[]
-interface moves {
-  [index: string]: listMoves[]
-}
 interface moveIA {
   [index: string]: string
 }
@@ -64,8 +59,7 @@ export class ChessEngine {
   field: ChessField
   castling: castlingType
 
-  levelAI: 0
-  gameState: gameStates
+  levelAI = 0
   mover: moverTypes
   playerType: moverTypes
   playerState: playerStates
@@ -416,7 +410,7 @@ export class ChessEngine {
       pieceInfo.type, pieces[strCell], posObj, this.field.scene, pieceInfo.isWhite)
   }
 
-  start(_typeStr: string, _initGame = false) {
+  start(_typeStr: string, _isTopLevel: boolean, _initGame = false) {
 
     if (_initGame) {
       this.hideCupturedMove()
@@ -427,8 +421,8 @@ export class ChessEngine {
       this.cells.stockNumber = 0
     }
 
-    this.gameState = gameStates.turns
     const isWhite = moverTypes.white === moverTypes[_typeStr]
+    this.levelAI = _isTopLevel && 4 || 0
     if (isWhite) {
       this.playerState = playerStates.pieceSearch
     } else {
@@ -441,7 +435,6 @@ export class ChessEngine {
   setNewGamesParams () {
     this.game = new jsChessEngine.Game()
 
-    this.gameState = gameStates.unStarted
     this.mover = moverTypes.white
     this.playerType = moverTypes.white
     this.playerState = playerStates.none

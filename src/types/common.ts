@@ -47,8 +47,6 @@ export interface BoardSizesType {
 
 export type pieces = {[index: string]: string}
 
-export enum gameStates { unStarted, turns, finished }
-
 export enum moverTypes { white, black }
 
 export enum playerStates { pieceSearch, cuptureMove, none, promotionSearch }

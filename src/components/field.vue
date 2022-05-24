@@ -25,9 +25,9 @@ export default {
     const fieldEl = ref(null)
     let chessField
 
-    const switchColor = (_game) => {
-      if (_game.type) {
-        chessField.startNewGame(_game.type)
+    const startNewGame = (_game) => {
+      if (_game) {
+        chessField.startNewGame(_game)
       }
     }
 
@@ -39,7 +39,7 @@ export default {
       chessField = new ChessField(fieldEl.value, 1000, 600)
       chessField.setGameState = changeGameState
       chessField.setGameState('Player, please select a color')
-      watchEffect(() => switchColor(props.p_game))
+      watchEffect(() => startNewGame(props.p_game))
     })
 
     return { fieldEl }
