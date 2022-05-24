@@ -2,6 +2,7 @@
   <div
     ref="fieldEl"
     class="field"
+    :style="{ width: width + 'px', height: height + 'px' }"
   />
 </template>
 
@@ -24,6 +25,8 @@ export default {
   setup(props, { emit }) {
     const fieldEl = ref(null)
     let chessField
+    const width = ref(0)
+    const height = ref(0)
 
     const startNewGame = (_game) => {
       if (_game) {
@@ -35,14 +38,20 @@ export default {
       emit('change-game-state', _state)
     }
 
+    const minWidth = 900
+    const plateHeight = 140
+
     onMounted(() => {
-      chessField = new ChessField(fieldEl.value, 1000, 600)
+      width.value = window.innerWidth > minWidth ? (window.innerWidth - 20) : minWidth
+      height.value = window.innerHeight - plateHeight
+
+      chessField = new ChessField(fieldEl.value, width.value, height.value)
       chessField.setGameState = changeGameState
       chessField.setGameState('Player, please select a color')
       watchEffect(() => startNewGame(props.p_game))
     })
 
-    return { fieldEl }
+    return { fieldEl, width, height }
   },
 }
 </script>

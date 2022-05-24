@@ -86,7 +86,6 @@ BODY {
   background: antiquewhite;
   font-size: 30px;
   padding: 10px;
-  padding-right: 100px;
   justify-content: center;
   border-radius: 10px 100px 0 0;
   outline: 5px solid green;
