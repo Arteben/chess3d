@@ -10,8 +10,8 @@
     <div class="checkbox">
       <label>
         <input
+          v-model="grandmasterModel"
           type="checkbox"
-          checked
         >
         Grandmaster level!
       </label>
@@ -20,7 +20,7 @@
 </template>
 
 <script>
-// import { onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { getGameTypes } from '@/utils/menuPoints'
 import MainButton from '@/components/button.vue'
 export default {
@@ -32,10 +32,26 @@ export default {
   // eslint-disable-next-line no-unused-vars
   setup(props, { emit }) {
     const btns = getGameTypes()
+
+    let isTop = false
+
+    const grandmasterModel = computed({
+      set: (_value) => { isTop = _value },
+      get: () => { return isTop },
+    })
+
     const clickBtn = (_title) => {
-      emit('click-menu-btn', _title)
+      emit('click-menu-btn', {
+        type: _title,
+        isTop: isTop,
+      })
     }
-    return { btns, clickBtn }
+
+    return {
+      btns,
+      clickBtn,
+      grandmasterModel,
+    }
   },
 }
 </script>

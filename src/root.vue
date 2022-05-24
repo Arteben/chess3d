@@ -11,12 +11,6 @@
       </div>
       <field :p_game="game" />
     </div>
-    <!-- <popup-menu
-      v-if="popupMenu"
-      :p_menu="popupMenu"
-      @close-popup="onClosePopup()"
-      @start-game="onStartGame"
-    /> -->
   </div>
 </template>
 
@@ -24,7 +18,6 @@
 import { ref } from 'vue'
 import MainMenu from '@/components/main-menu.vue'
 import Field from '@/components/field.vue'
-// import PopupMenu from '@/components/popup-menu.vue'
 export default {
   name: 'RootElement',
   components: {
@@ -33,25 +26,16 @@ export default {
     // PopupMenu,
   },
   setup() {
-    let popupMenu = ref('')
     let game = ref({})
 
-    const onSelectMenu = (_title) => {
-      popupMenu.value = _title
-    }
-
-    const onClosePopup = () => {
-      popupMenu.value = ''
-    }
-
-    const onStartGame = (_type) => {
-      game.value = { type: _type }
+    const onStartGame = (_infoGame) => {
+      game.value = {
+        type: _infoGame.type,
+        isGrandmaster: _infoGame.isTop,
+      }
     }
 
     return {
-      onSelectMenu,
-      popupMenu,
-      onClosePopup,
       onStartGame,
       game,
     }
