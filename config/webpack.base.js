@@ -2,7 +2,6 @@ const paths = require('./paths')
 
 const webpack = require('webpack')
 
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 
@@ -80,6 +79,9 @@ module.exports = {
       {
         test: /\.(jpe?g|png|gif|svg|eot|ttf|gltf|woff2?)$/i,
         type: 'asset',
+        generator: {
+          filename: './img/[name][ext]',
+        },
       },
     ],
   },
@@ -87,13 +89,6 @@ module.exports = {
     new VueLoaderPlugin(),
     new webpack.ProgressPlugin(),
 
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: `${paths.public}/`,
-        },
-      ],
-    }),
 
     new HtmlWebpackPlugin({
       template: 'template.html',
