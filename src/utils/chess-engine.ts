@@ -110,21 +110,24 @@ export class ChessEngine {
       }
     }
 
-    if (this.isPlayerTurn) {
+    if (this.getConf().isFinished) {
       if (this.getConf().checkMate) {
-        stateStr = 'CHECKMATE, player you are lost'
-      } else if (this.getConf().check) {
-        stateStr = 'Player you CHECK,' + getPlayerStates()
+        stateStr = 'CHECKMATE!'
       } else {
-        stateStr = 'Player, ' + getPlayerStates()
+        stateStr = 'STALEMATE!'
       }
-    } else if (this.getConf().checkMate) {
-      stateStr = 'Player you do CHECKMATE, you are WIN!'
+    } else if (this.isPlayerTurn) {
+      stateStr = 'Player, ' + getPlayerStates()
     } else {
       stateStr = 'Please, wait for AI do a move'
     }
 
     return stateStr
+  }
+
+  get hasFinished(): boolean {
+    const isEmptyMoves = Object.keys(this.game.moves()).length == 0
+    return this.getConf().isFinished || isEmptyMoves
   }
 
   // events
@@ -214,6 +217,7 @@ export class ChessEngine {
       this.cells.hideCell(this.AIMoveCell)
       this.AIMoveCell = null
     }
+    this.field.render()
   }
 
   promotionPawn (_pawnCell: cellCoords, _move: cellCoords, _isPlayer: boolean) {
@@ -351,26 +355,40 @@ export class ChessEngine {
 
   nextTurn () {
 
-    if (this.getConf().checkMate) {
+    const clearSelectedPlayerPieces = () => {
+      this.cells.hideAllowedCells(this)
+      this.hideCupturedMove()
+      this.playerState = playerStates.none
+    }
+
+    if (this.hasFinished) {
+      clearSelectedPlayerPieces()
       this.field.setGameState(this.state)
       return
     }
 
     if (this.isPlayerTurn) {
-      this.cells.hideAllowedCells(this)
-      this.hideCupturedMove()
+      clearSelectedPlayerPieces()
       this.mover = this.nextMover
-      this.playerState = playerStates.none
       this.turnAI()
     } else {
       this.mover = this.nextMover
       this.playerState = playerStates.pieceSearch
     }
+
     this.field.setGameState(this.state)
   }
 
   turnAI () {
-    const moveForAI = <moveIA>this.game.aiMove(this.levelAI)
+    let moveForAI: moveIA
+
+    try {
+      moveForAI = <moveIA>this.game.aiMove(this.levelAI)
+    } catch (_error) {
+      this.nextTurn()
+      return
+    }
+
     this.field.setGameState(this.state)
     const piece = getCoords(Object.keys(moveForAI)[0])
     const move = getCoords(Object.values(moveForAI)[0])
